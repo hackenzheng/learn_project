@@ -1,0 +1,24 @@
+测试并发性能,参考自github上
+
+baseline和epoll测试代码来自网络，略做改动。
+
+
+安装
+
+1. 安装虚拟环境'pip install virtualenv'
+2. 'apt-get install libevent-dev'
+3. 创建虚拟环境'virtualenv evt'
+4. 安装gevent './evt/bin/pip install gevent'
+5. 安装gevent './evt/bin/pip install eventlet'
+
+
+测试
+1. 启动程序，例如'./evt/bin/python t_gevent.py'
+2. siege -c 100 -r 100 -b htt://localhost:8080
+
+在i3机器上，tps如下：
+t_baseline.py 性能取决与listen参数，如果listen(10),tps可以到3000左右, listen(1),tps在300左右。
+t_epoll_level.py listen(1), epoll.poll(10),700左右，listen(10), epll.poll(10), tps在2400左右，峰值。
+t_epoll_edge.py  listen(1), epoll.poll(10),650左右，listen(10), epll.poll(10), tps在2000左右，峰值。
+t_gevent.py   tps在8000左右
+t_eventlet.py tps在8000左右。

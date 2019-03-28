@@ -1,0 +1,3 @@
+## 数据结构
+   1. redis hash表的初始化:tabel初始化为NULL,其他变量初始化为0.也就是创建的时候是默认没有元素，然后一个个添加。
+   在hasttb的基础上进一步封装得到dict,每个dict有两个hashtb,用于rehash扩容或缩容

@@ -5,8 +5,9 @@
    版本kafka_2.12-2.2.0下载链接https://www.apache.org/dyn/closer.cgi?path=/kafka/2.2.0/kafka_2.12-2.2.0.tgz
    解压到/usr/bin或~/bin目录下即可
 ### java运行环境(jdk)安装
-   jdk包含jre，Ubuntu自带了java环境，如果没有
-   从oracle官网https://www.oracle.com/technetwork/java/javase/downloads/index.html下载Ubuntu适用的deb包，然后按安装即可
+   jdk包含jre，Ubuntu自带了java环境， 使用命令java -version查看，如果找不到命令
+   从oracle官网https://www.oracle.com/technetwork/java/javase/downloads/index.html下载Ubuntu适用的deb包，然后按安装即可。
+   或者下载二进制包然后解压到/usr/local目录，设置PATH和JAVA_HOME变量
 
 ## 配置
 启动参考： http://kafka.apache.org/quickstart

@@ -123,13 +123,14 @@ int prepareClientToWrite(client *c) {
     return C_OK;
 }
 ```
-clientHasPendingReplies(c)通过判断client对象的bufpos字段(int型)和reply字段(这是一个链表)的长度是否大于0判断发送缓冲区中是否还有未发送的应答命令。
-其中clientInstallWriteHandler(c)将需要发送数据的client加入到队列.
+clientHasPendingReplies(c)通过判断client对象的bufpos字段(int型)和reply字段(这是一个链表)的长度是否大于0判断发送缓冲区中
+是否还有未发送的应答命令。其中clientInstallWriteHandler(c)将需要发送数据的client加入到队列.
 如果当前client对象不是处于CLIENT_PENDING_WRITE状态，且在发送缓冲区没有剩余数据，则给该client对象设置CLIENT_PENDING_WRITE标志，
 并将当前client对象添加到全局server对象的名叫clients_pending_write链表中去。这个链表中存的是所有有数据要发送的client对象，
 要发送的数据通过networking.c/_addReplyToBuffer()函数拷贝到client对应的发送缓冲区中。
 然后会在server.c/beforeSleep()函数中调用handleClientsWithPendingWrites将所有客户端要发发送的数据一次性处理完。
-如果因为缓冲区满等原因导致没有完全发送出去，则会注册一个写的事件下次eventloop之后接着写。
+如果因为缓冲区满等原因导致没有完全发送出去，则会注册一个写的事件下次eventloop之后接着写。 
+_addReplyToBuffer函数会尝试将命令结果放入输出缓冲(c->buf)中，如果不成功(c-reply中有内容，或者超过缓冲大小)，会调用_addReplyObjectToList函数放入c->reply链表中。
 ```
 /* This function is called just before entering the event loop, in the hope
  * we can just write the replies to the client output buffer without any

@@ -10,6 +10,7 @@ partition物理上由很多segment(具体的文件)组成，segment是存放mess
 一个消费者可以订阅多个topic
 
 整体架构
+
 ![](./KafkaStructure.png)
 
 Kafka的设计理念之一就是同时提供离线处理和实时处理。根据这一特性，可以使用Storm这种实时流处理系统对消息进行实时在线处理，
@@ -80,3 +81,15 @@ Kafka给多个Replication设置了一个Leader，其他副本叫做follower，Pr
 基本使用：https://blog.csdn.net/luanpeng825485697/article/details/81036028
 
 kafka数据可靠性深度解读 ：https://mp.weixin.qq.com/s?__biz=MzU1NDA4NjU2MA==&mid=2247486245&amp;idx=1&amp;sn=a6ecb1026b6ef24cabe10ef9a4b7570d&source=41#wechat_redirect
+
+
+### 消息重复和丢失
+   重复的原因：
+      (1) 重复发送：生产发送的消息没有收到正确的broker响应，导致producer重试。
+      (2) 重复消费：数据消费完没有及时提交offset到broker。
+   丢失的原因： 
+      (1) producer发送消息完，不管结果了，如果发送失败也就丢失了。
+      (2) producer发送消息完，只等待lead写入成功就返回了，leader crash了，这时follower没来及同步，消息丢失。
+      
+      
+参考： https://www.cnblogs.com/wangzhuxing/p/10124308.html

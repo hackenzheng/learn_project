@@ -39,7 +39,7 @@
            </property>
            </configuration>
    
-   启动hbase
+   启动hbase,单机没用到hdfs,所以不装Hadoop也能运行。
    
         /usr/local/HBase/bin/start-hbase.sh
         running master, logging to /usr/local/Hbase/bin/../logs/hbase-zhg-master-zhg.out

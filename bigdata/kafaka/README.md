@@ -93,3 +93,6 @@ kafka数据可靠性深度解读 ：https://mp.weixin.qq.com/s?__biz=MzU1NDA4NjU
       
       
 参考： https://www.cnblogs.com/wangzhuxing/p/10124308.html
+
+消息队列应用场景
+https://blog.csdn.net/dj2008/article/details/78872889

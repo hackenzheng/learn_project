@@ -1,3 +1,15 @@
 ## 数据结构
+   基础的数据结构sds,双向链表,字典(两个hash表),ziplist, skiplist,整数集合(整数数组)，在此基础上再形成对象。
+   在redis里面，每个key,每个val都会再抽象成redis object,而非直接用基础的数据结构。
+   
+   skiplist跳表，底层就是链表，链表的每个元素有一个level数组，数组中每个元素是指向skiplistnode的指针。跳表在redis里面
+   只作为zset和内部数据结构。 
+   
+   zset中第一个节点的rank是1而不是0，加入zset1里有1,one; 2 two; 3 three; 三个元素，zrank zset1 one返回的是1而不是0.
+   但是zrange的计数却是从0开始。zrange zset1 start stop的时间复杂度是log(n) + stop-start.实现过程是先根据rank start找到
+   对应的元素的位置，然后再往前走。根据rank找元素的时间复杂度平均是log(n),最差是n，过程是从第一个节点的最上层开始，直接根据span判断。
+   根据分值和成员对象查找在跳跃表中的排位的复杂度平均log(n),最差是n，但是根据score做比较。
+
+
    1. redis hash表的初始化:tabel初始化为NULL,其他变量初始化为0.也就是创建的时候是默认没有元素，然后一个个添加。
    在hasttb的基础上进一步封装得到dict,每个dict有两个hashtb,用于rehash扩容或缩容

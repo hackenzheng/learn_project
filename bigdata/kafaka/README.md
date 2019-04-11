@@ -84,6 +84,7 @@ kafka数据可靠性深度解读 ：https://mp.weixin.qq.com/s?__biz=MzU1NDA4NjU
 
 
 ### 消息重复和丢失
+https://blog.csdn.net/xinlangtianxia/article/details/51387689
    重复的原因：
       (1) 重复发送：生产发送的消息没有收到正确的broker响应，导致producer重试。
       (2) 重复消费：数据消费完没有及时提交offset到broker。

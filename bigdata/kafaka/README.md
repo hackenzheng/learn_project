@@ -7,7 +7,7 @@ partition物理上由很多segment(具体的文件)组成，segment是存放mess
 对于传统的mq而言，一般会删除已经被消费的消息，而Kafka会保留所有的消息，无论其被消费与否。当然，因为磁盘限制，不可能永久保留所有数据（实际上也没必要），
 因此Kafka提供两种策略删除旧数据。一是基于时间，二是基于Partition文件大小，在server.properties中设置
 
-一个消费者可以订阅多个topic
+一个消费者可以订阅多个topic,一个topic也可以被多个消费者消费
 
 整体架构
 
@@ -60,8 +60,7 @@ Consumer Group：多个consumer可以组成一个group，每个Consumer只能属
     异步发送：通过带有回调函数的send()方法发送消息，当producer收到Kafka broker的response会触发回调函数
 
 
-通常一个producer起一个线程开始发送消息。为了优化producer的性能，一般会有下面几种方式：
-单个producer起多个线程发送消息；使用多个producer。
+通常一个producer起一个线程开始发送消息。为了优化producer的性能，可以单个producer起多个线程发送消息；使用多个producer。
 
 
 kafka的消费模式总共有3种：最多一次，最少一次，正好一次。为什么会有这3种模式，是因为consumer处理消息，提交反馈这两个动作不是原子性。

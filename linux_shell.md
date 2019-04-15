@@ -4,11 +4,6 @@
     tcpdump -i eth0 "host 113.105.88.151 && icmp"  -vnn   #支持的是网络层协议，不支持http等应用层协议
     tcp.flags.syn == 1 and tcp.flags.ack == 0   #过滤tcp连接时的包
     
-    
-    netstat -lntp #查看监听(Listen)的端口
-    netstat -antp #查看所有建立的TCP连接
-    netstat -an| grep 3306   #是否在监听某个端口
-    
     ping -c 1 -i 0.5 -t 3 www.baidu.com|grep PING|awk '{print $3}'
          
     date -d @1508450365    #时间戳转日期
@@ -27,7 +22,17 @@
     du -h -d 1
     lsof | grep delete    #已经被删除但是仍被使用的文件是
     echo "" >> file       #在线清空文件,rm只是删除了文件名与inode的link关系
+
+netstat:
+
+    -a (all)显示所有选项，只netstat不带任何选项是不显示LISTEN相关
+    -t (tcp)仅显示tcp相关选项, udp是-u
+    -n 拒绝显示别名，能显示数字的全部转化成数字,比如localhost会转成0.0.0.0， 服务器name会转成本机局域网ip，比如k8snode->192.168.12.189
+    -l 仅列出有在 Listen (监听) 的服務状态
+    -p 显示建立相关链接的程序名
     
+    提示：LISTEN和LISTENING的状态只有用-a或者-l才能看到
+  
 
 挂载磁盘 
 
@@ -66,5 +71,8 @@ ubuntu下service、systemctl和/etc/init.d的关系：
 
 linux默认定时执行的任务只有hour,day,week,monthly，如果要增加每分中执行的，需要在/etc/cron.d目录下添加一个文件，比如1min文件，其中的内容如下，同时新建/etc/cron.min目录。
 目录下的定时脚本脚本不能是.sh结尾。 要避免同时有多个定时任务在执行，比如某个定时任务是1min中执行一次，但某次执行的时间超过了一分中，所以要在脚本里面做判断。
+
+
+
 
 

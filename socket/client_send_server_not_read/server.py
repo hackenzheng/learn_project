@@ -9,9 +9,11 @@ import time
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind(('127.0.0.1', 2222))
-s.listen(5)
-c, addr = s.accept()
 
+s.listen(5)
+# time.sleep(10)  # 若在这里睡眠，连接过来是可以建立的， accept只是从连接的队列中取出最早建立的
+c, addr = s.accept()
+print(c)
 
 time.sleep(1000)
 a=c.recv(1024)

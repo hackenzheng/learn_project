@@ -18,6 +18,8 @@ docker代理设置：
     [Service]
     Environment="HTTPS_PROXY=http://127.0.0.1:8118"
     
+    # 还可以设置指定的镜像不走代理"NO_PROXY=localhost,127.0.0.1,docker-registry.somecorporation.com"
+    
     ###Flush changes:
     systemctl daemon-reload
     
@@ -26,7 +28,7 @@ docker代理设置：
     
     systemctl show --property=Environment docker  #查看修改结果
     
-    就可以尝试pull gcr.io类的镜像
+    就可以尝试pull gcr.io类的镜像，一定是重启docker才能让代理生效
 
 
     

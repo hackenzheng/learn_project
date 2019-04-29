@@ -133,7 +133,8 @@ spark api类型有rdd api,DataFrame API 和 Machine Learning API， rdd api是�
 RDD操作的执行过程 
 ![](../img/spark-execute.png )
 
-用户编写的spark程序就是driver,driver会把计算任务分成一系列小的task，然后送到executor执行。executor之间可以通信，
+用户编写的spark程序就是driver,driver会把计算任务分成一系列小的task，然后送到executor执行，executor之间可以通信。
+executor是执行application的进程，以多线程的方式执行task。
 
 Hadoop中的每步操作都要读取磁盘，io开销和序列化时间消耗比较大。spark的改进就是中间结果放内存，最开始的输入数据仍然要从磁盘读取，以及最后的
 输出要写回磁盘。 如果数据太大，中间结果也是会存放在磁盘上。
@@ -145,21 +146,34 @@ Hadoop中的每步操作都要读取磁盘，io开销和序列化时间消耗比
 Spark为结构化数据处理引入了一个称为Spark SQL的编程模块，该模块提供了一个称为DataFrame的编程抽象。
 数据集的来源格式不限，可以是hive表，结构化数据文件，外部数据库或现有RDD，但要是结构化的数据。
 
-从json和txt文件中读取：
+    从json和txt文件中读取：
+    
+    people.json文件内容：
+    {"name": "a"}
+    {"name": "b", "age":30}
+    {"name": "c", "age": 19}
+    
+    people.txt文件：
+    a, 29
+    b, 30
+    c, 19
+    
+    val sqlContext=new org.apache.spark.sql.SQLContext(sc)
+    val dfs=sqlContext.read.json("people.json")
+    dfs.show    # 显示数据
+    dfs.printSchema()   #　查看dataframe的schema
+    dfs.select("name").show()  # 从dataframe里选择某一列
+    dfs.filter(dfs("age")>20).show()  #　利用过滤器筛选
+    
+spark sql可以以数据库作为数据来源，那么这种情况与直接操作数据库的区别有：
+个人想法： spark作为统一的计算引擎，能够将不同来源的数据整合到一起，对外提供统一的sql查询，比直接使用sql肯定是更方便的。
+另外spark是分布式处理，计算能力比单纯的数据库的存储引擎是更强大。
 
-people.json文件内容：
-{"name": "a"}
-{"name": "b", "age":30}
-{"name": "c", "age": 19}
+在Spark 2.0，引入了SparkSession，作为一个新的切入点并且包含了SQLContext和HiveContext的功能，SparkSession
+就是设计出来合并SparkContext和SQLContext的。Builder 是 SparkSession 的构造器，通过 Builder, 可以添加各种配置。
 
-people.txt文件：
-a, 29
-b, 30
-c, 19
 
-val sqlContext=new org.apache.spark.sql.SQLContext(sc)
-val dfs=sqlContext.read.json("people.json")
-dfs.show    # 显示数据
-dfs.printSchema()   #　查看dataframe的schema
-dfs.select("name").show()  # 从dataframe里选择某一列
-dfs.filter(dfs("age")>20).show()  #　利用过滤器筛选
+## spark ml
+ml和mllib都是Spark中的机器学习库，目前常用的机器学习功能2个库都能满足需求。spark官方推荐使用ml, 因为ml功能更全面更灵活。
+spark.mllib里是基于RDD的API，spark.ml里是基于 DataFrame的API。ml中的操作可以使用pipeline, 跟sklearn一样，
+可以把很多操作(算法/特征提取/特征转换)以管道的形式串起来，然后让数据在这个管道中流动。

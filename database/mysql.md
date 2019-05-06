@@ -193,3 +193,49 @@ NULL代表没有值，意味着你并不知道该列应该填入什么数据，�
        mysql -u root -p  连接数据库
        alter user 'root'@'localhost' identified by 'youpassword';  修改密码
        flush privileges;    刷新权限
+
+
+## mysql集群
+MySQL作为关系型数据库的一种，天然不支持分布式，不方便扩容。其集群主要是指高可用集群，比如MMM和MHA方案，实现主从复制以及主从切换。
+MySQL不能水平扩展的原因限制了很多应用，许多支持分布式，兼容MySQL的关系型数据库出现，比如阿里的oceanbae, 开源的TiDB.
+其中TiDB底层是k-v存储，类似Hbase,对外自行实现了sql解析器和执行器，将k-v存储映射到关系型数据库。
+
+mysql中间件支持分布式的实质是通过分库分表实现，官方的MySQL cluster要求存储引擎是ndb,事务的隔离级别只支持readcommitted,生产环境很少使用。 
+由于MySQL本质上不是一个分布式数据库产品，所以cobar的应用会有许多局限，比如不支持跨库的join，
+传统的分库分表本来就是非常成熟的技术，cobar等只是简化了这个过程
+
+MySQL cluster是在关系型的基础上做分布式，使得实现复杂， 读和写事务很复杂。而TiDB是先确定做分补水，然后实现关系型标准，架构上更简单。
+
+## 分库分表与分区
+分库： 将表拆分后放到不同的库，不同的库可以在不同的数据库实例，从而实现多服务器扩展
+分表： 将表拆分后仍然在同一个库，库内分表只解决了单一表数据量过大的问题，但没有将表分布到不同机器的库上，因此对于减轻MySQL数据库的压力来说，
+帮助不是很大，大家还是竞争同一个物理机的CPU、内存、网络IO，最好通过分库分表来解决。
+分库分表： 即将表拆分到不同的库
+分区： 数据库本身支持的功能，表的存储分为不同的文件，所有的分区文件仍然在同一台服务器上，hbase等数据库天然就是分区，并且不同分区可以在不同服务器上
+
+
+分库带来的问题：
+
+    1. 事务支持，扩库事务就成分布式的了，问题难度显然上升了一个级别
+    2. 查询结果合并，比如order by/limit/查询中不带分表(partion key)字段，需要遍历所有库然后在业务代码中进行内存合并
+    3. join，这个更难
+
+数据库扩展：
+
+数据库的扩展一般可分为读的扩展、写的扩展以及数据量的扩展。
+对于读的扩展，通过复制架构，增加更多的从库，是可以大大缓解读的，而在合适的时机使用缓存架构，是普遍认为更良好的一种解决方案。
+对于写的扩展，复制架构其实无助于解决问题，如果不能从应用层减少数据的写入，我们只能进行垂直或者水平的拆分，把数据的写入平均分布到多个节点。
+对于数据量的扩展，也是水平切分，支持多节点
+
+参考：
+
+    <数据库分库分表，何时分？怎样分？> https://juejin.im/entry/5c258e02f265da617573d346
+    <五大常见的MySQL高可用方案> https://zhuanlan.zhihu.com/p/25960208
+    <mysql cluster适用场景分析>： http://blog.chinaunix.net/uid-26950862-id-4573456.html
+    <数据库中间件> https://www.zhihu.com/question/36758780
+    <关于MySQL集群的一些看法> https://zhuanlan.zhihu.com/p/20204156
+    <假如让你来设计数据库中间件> https://mp.weixin.qq.com/s/6kuVgdO7RBs9gs229wG3wA
+    <数据库中间件360 Atlas调研笔记> https://mp.weixin.qq.com/s/31WOensXaLdaAp9WRMW7PA
+    <业界难题-“跨库分页”的四种方案> https://mp.weixin.qq.com/s/h99sXP4mvVFsJw6Oh3aU5A
+    <数据库架构设计与业务的变化> https://mp.weixin.qq.com/s/qbVrQ_aUdL9k28XVinpJXA
+    

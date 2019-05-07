@@ -117,3 +117,4 @@ redis的分布式锁： 在版本2.6.12之前需要用setnx和expire两条指令
 redis的多字段排序： redis的zset只支持对score排序，score相同的在对key排序。如果有多字段的要求，根据业务，
 可以考虑score设置为两个字段或多个字段的组合，且都只能是数值型的。 要是更复杂的多字段排序是不支持的。
 参考<使用Redis的有序集合实现排行榜功能>:https://juejin.im/post/5c876854f265da2d9e179112
+

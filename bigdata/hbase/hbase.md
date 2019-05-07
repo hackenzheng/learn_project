@@ -49,5 +49,15 @@
    
    列簇的设计：列簇是在建表的时候定义好，最多两个，列可以随时添加
 
+hbase不支持join，因为hbase支持的列数足够大，足够在一个表里面存储所有的信息，不需要拆分。
 
-参考： https://mp.weixin.qq.com/s/r_ouxFJ4FajyDl835iEcBQ
+## zk
+zk在hbase中最大的功能是检测某个节点是否宕机， 检测的方式是每个节点上线时都会向zk注册，建立一个session，如果机器宕机，这个session就会过期。
+HMaster主要维护系统表-ROOT-.META.(该表记录regionserver和region对应信息)。hmaster启动时候会将hbase 系统表-ROOT- 加载到 zookeeper cluster，
+hbase regionserver则用于多个/单个region维护。region则对应为hbase数据表的表分区数据维护
+
+参考：
+ 
+    https://mp.weixin.qq.com/s/r_ouxFJ4FajyDl835iEcBQ
+    <hbase 不睡觉书>
+    

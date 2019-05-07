@@ -1,58 +1,45 @@
 ## 大数据平台介绍
-Hadoop, spark等都是大数据计算引擎,当前已经发展到了第四代,Hadoop是第一代,spark是第三代,flink是第四代. Hadoop 2.0也称为YARN.
+大数据引擎：Hadoop是第一代,基于yarn的Hadoop是第二代， spark是第三代,flink是第四代.
 spark和flink都可以在裸机上部署,也可以在Hadoop集群上面部署
-大数据应用场景:  比如一个10G的日志文件,要统计其行数
-Hadoop需要自己写map reduce函数
-spark只需要写类似sql语句一样,一行就能搞定,第三代计算引擎的特点主要是 Job 内部的 DAG 支持（不跨越 Job）
+Hadoop需要自己写map reduce函数，spark只需要写类似sql语句一样,一行就能搞定,
 flink与spark的易用性是一样的,只不过spark的流处理是最小是一次执行一个分区的数据,不能每条数据都实时技术，而flink最少是一条数据.
 
+## mapreduce和yarn
 
-mapreduce的实现需要JobTracker和TaskTracker两种角色
-Jobtracker是主线程，它负责接收客户作业提交，调度任务到工作节点上运行，并提供诸如监控工作节点状态及任务进度等管理功能，一个MapReduce集群有一个jobtracker，一般运行在可靠的硬件上。
-tasktracker由jobtracker指派任务，实例化用户程序，在本地执行任务并周期性地向jobtracker汇报状态。在每一个工作节点上永远只会有一个tasktracker。Tasktracker和DataNode运行在一个机器上，
-从而使得每一台物理机器既是一个计算节点，同时也是一个存储节点。每一个tasktracker能够配置map和reduce的任务片数（taskslot），这个数字代表每一种任务能被并行执行的数目。
-tasktracker是通过周期性的心跳来通知jobtracker其当前的健康状态，每一次心跳包含了可用的map和reduce任务数目、占用的数目以及运行中的任务详细信息。
+Hadoop1.0只实现了hdfs和mapreduce两大基本功能,hdfs需要的组件是namenode, datanode，用于分布式存储。mapreduce是计算引擎也是计算方式，
+需要的组件有jobtracker, tasktracker。每个map后面只能跟reduce，那么map的输出是直接存储到集群中节点的本地存储，而非hdfs.
+hadoop 1.0的jobtracker即负责资源调度又负责任务调度，功能过多而造成负载过重，限制了集群规模。 Hadoop 2.0引入了yarn,将资源管理和调度抽离出来由ResourceManager实现，
+ApplicationMaster则负责与具体应用程序相关的任务切分、任务调度和容错, 去掉了之前的jobtracker和tasktracker.
 
-Hadoop1.0只实现了hdfs和mapreduce两大基本功能,因此也就只有namenode, datanode, jobtracker, tasktracker,因为namenode和jobtracker的单点限制,支持的集群规模上限有限.
-除此之外还有资源管理低效, 资源无法隔离等问题.
-2.0引入了yarn模块,实现了资源更高效的管理, 有ResourceManager, NodeManager, ApplicationMaster, container(非docker)角色,去掉了之前的jobtracker和tasktracker.
-JobTracker由资源管理和作业控制两部分组成，功能过多而造成负载过重，从设计角度上看，Hadoop未能够将资源管理相关功能与应用程序相关功能非开，造成Hadoop1.0难以支持多种计算框架。
-而YARN通过将资源管理和应用程序管理两部分分剥离开，分别由ResouceManager和ApplicationMaster负责，其中，ResouceManager专管资源管理和调度，
-而ApplicationMaster则负责与具体应用程序相关的任务切分、任务调度和容错等.
+yarn的工作流程:
+提交任务到yarn, yarn由resourcemanage分配资源,然后启动一个am,再由am申请资源运行task.applicationmaster是client每提交一个任务生成一个. 生成am之后,am再想rm去申请container
+用于执行具体的任务, 往往是会申请多个任务. 然后再有schedular具体的分配任务个数,传递参数,再启动进程.
 
-对 Flink 而言，其所要处理的主要场景就是流数据，批数据只是流数据的一个极限特例而已。即Flink 会把所有任务当成流来处理，这也是其最大的特点。
-在 Flink 集群中，计算资源被定义为 Task Slot。每个 TaskManager 会拥有一个或多个 Slots。JobManager 会以 Slot 为单位调度 Task。
-但是这里的 Task 跟我们在 Hadoop 中的理解是有区别的。对 Flink 的 JobManager 来说，其调度的是一个 Pipeline 的 Task，而不是一个点。
-举个例子，在 Hadoop 中 Map 和 Reduce 是两个独立调度的 Task，并且都会去占用计算资源。对 Flink 来说 MapReduce 是一个 Pipeline 的 Task，只占用一个计算资源。
+yarn最初是为了改善mapreduce的实现，但它具有足够的通用性，同样可以支持其他的分布式计算模式。
+使用yarn的话每个任务作为容器运行，这里的容器可以是一个进程，也可以是Linux cgroup, 也可以是docker，所以在k8s之前有用yarn调度docker的
 
+参考<Hadoop权威指南>
 
-Spark 2.0之前,核心类型接口是RDD,2.0之后就是Dataset, RDD是通用的数据,可以是结构化或非结构化, 而Spark SQL对结构化数据特有的类sql操作.
-hive也是将sql操作翻译为mr方式执行,hive on spark大体与SparkSQL结构类似，只是SQL引擎不同，但是计算引擎都是spark.
-
+## spark dag
 为什么要实现DAG:大数据处理引擎最开始是mapreduce,将计算分为两个阶段，分别为 Map 和 Reduce。对于上层应用来说，就不得不想方设法去拆分算法，
 甚至于不得不在上层应用实现多个 Job 的串联，以完成一个完整的算法，例如迭代计算. 完成一个复杂的任务得由开发人员将任务进行分解, 手动拆分为map和reduce,以及中间过程,最终形成一个dag.
-
 spark的dag: 各个rdd之间存在依赖关系,rdd分原生rdd即通过文件生成的,以及从其他rdd变换过来,从其他rdd变换过来存在依赖关系,
 这些依赖关系形成DAG. DAGScheduler对这些依赖关系形成的DAG，进行Stage划分，划分的规则很简单，从后往前回溯，遇到窄依赖加入本stage，遇见宽依赖进行Stage切分。
 完成了Stage的划分,DAGScheduler基于每个Stage生成TaskSet,并将TaskSet提交给TaskScheduler。TaskScheduler 负责具体的task调度,在Worker节点上启动task。
 
 
-ml和mllib都是Spark中的机器学习库,但只支持传统的机器学习,不支持深度学习,因为spark对结构化数据支持的比较好
-目前常用的机器学习功能2个库都能满足需求,ml功能更全面更灵活，未来会主要支持ml，mllib很有可能会被废弃
-mllib的pipeline可以使得多个机器学习的算法顺序执行,每一步都依赖上一步的结果.不能可视化,都放到pipeline.fit接口里面后,所定义的任务按顺序执行.
-spark 结合keras可以对深度学习做训练,但是数据仍然得是结构化的.
-
-
-yarn的工作流程:
-提交任务到yarn, yarn由resourcemanage分配资源,然后启动一个am,再由am申请资源运行task.
-spark on yarn中的resourcemanage是常驻的,applicationmaster是client每提交一个任务生成一个. 生成am之后,am再想rm去申请container
-用于执行具体的任务, 往往是会申请多个任务. 然后再有schedular具体的分配任务个数,传递参数,再启动进程.
-schedular是spark的schedular,这个schedular的位置可以是client端,可以在applicationmaster上,所以spark on yarn有YARN-Client和YARN-Cluster两种模式
+## flink
+对 Flink 而言，其所要处理的主要场景就是流数据，批数据只是流数据的一个特例,即Flink 会把所有任务当成流来处理，这也是其最大的特点。
+在 Flink 集群中，计算资源被定义为 Task Slot。每个 TaskManager 会拥有一个或多个 Slots。JobManager 会以 Slot 为单位调度 Task。
+但是这里的 Task 跟我们在 Hadoop 中的理解是有区别的。对 Flink 的 JobManager 来说，其调度的是一个 Pipeline 的 Task，而不是一个点。
+举个例子，在 Hadoop 中 Map 和 Reduce 是两个独立调度的 Task，并且都会去占用计算资源。对 Flink 来说 MapReduce 是一个 Pipeline 的 Task，只占用一个计算资源。
 
 
 ## spark介绍
 Spark是用Scala来写的，Scala是基于java的，是一种运行在Java虚拟机上并且能够使用Java库的编程语言，代码都运行在jvm上。所以Spark对Scala肯定是原生态支持的，要安装spark要事先安装jdk和Scala。
 Spark环境的搭建，主要包括四个步骤：JDK的安装，Scala的安装，Hadoop的安装，Spark的安装。
+
+spark也是使用的mapreduce的计算方式，但中间结果会写到内存，数据在内存能够进行迭代运算，而不用每计算一次就落盘一次。
 
 ## 安装
 jdk安装参考hbase的部署过程
@@ -177,3 +164,8 @@ spark sql可以以数据库作为数据来源，那么这种情况与直接操�
 ml和mllib都是Spark中的机器学习库，目前常用的机器学习功能2个库都能满足需求。spark官方推荐使用ml, 因为ml功能更全面更灵活。
 spark.mllib里是基于RDD的API，spark.ml里是基于 DataFrame的API。ml中的操作可以使用pipeline, 跟sklearn一样，
 可以把很多操作(算法/特征提取/特征转换)以管道的形式串起来，然后让数据在这个管道中流动。
+
+两者只支持传统的机器学习,不支持深度学习,因为spark对结构化数据支持的比较好,spark 结合keras可以对深度学习做训练,但是数据仍然得是结构化的.
+
+## spark 优化
+<Spark性能优化指南——高级篇> https://tech.meituan.com/2016/05/12/spark-tuning-pro.html

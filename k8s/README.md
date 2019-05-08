@@ -58,6 +58,9 @@ k8s服务注册与发现：
     服务最终能访问还是需要IP和端口，服务名和ip:port的对应的关系存储在etcd里面。 其他pod可以通过环境变量和dns解析去获取到对应关系，即服务发现。
     当然dns是更方便更智能的方式。
     
+    其实微服务所谓的服务发现/name service不要被忽悠觉得是多神奇的东西，实质就是service name和address的对应关系，最简单的Nginx/Apache这些都能做（域名转向，proxy），
+    或者你要写个name : address的对应关系到db里面也完全可以，再配一个定时healthcheck的服务，最简单的服务发现也就行了。微服务的开发并不是难点，难点是微服务的配置和部署
+    
     k8s里面每个作为服务端的pod都提供了服务，可以是http服务也可以说rpc或数据库服务，集群内的其他pod要想访问该服务就要知道服务的ip和端口，但是pod会重启，重启后
     IP会变，所以使用service绑定pod，service的clusterip不变。 service就是k8s提供的微服务机制，service的创建就是服务注册，服务发现就是解析到服务的cluster ip.
     但是pod要访问服务还是要知道service的cluster ip，要部署后才知道,很不方便。 有环境变量和dns两种方式实现服务发现，

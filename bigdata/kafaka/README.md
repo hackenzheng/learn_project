@@ -96,3 +96,6 @@ https://blog.csdn.net/xinlangtianxia/article/details/51387689
 
 消息队列应用场景
 https://blog.csdn.net/dj2008/article/details/78872889
+
+## 其他
+<美团-消息队列设计精要> https://tech.meituan.com/2016/07/01/mq-design.html

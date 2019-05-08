@@ -202,8 +202,8 @@ NULL代表没有值，意味着你并不知道该列应该填入什么数据，�
        use T2;
        CREATE TABLE test (id INT NOT NULL primary key auto_increment, name VARCHAR( 50 ) NOT NULL);
 
-## mysql集群
-MySQL作为关系型数据库的一种，天然不支持分布式，不方便扩容。其集群主要是指高可用集群，比如MMM和MHA方案，实现主从复制以及主从切换。
+## mysql主从集群
+MySQL作为关系型数据库的一种，天然不支持分布式，不方便扩容。其集群主要是指高可用集群，比如MMM和MHA方案，实现主从复制以及主从切换。有从库保证了读的高可用，但此时写库仍然是单点
 MySQL不能水平扩展的原因限制了很多应用，许多支持分布式，兼容MySQL的关系型数据库出现，比如阿里的oceanbae, 开源的TiDB.
 其中TiDB底层是k-v存储，类似Hbase,对外自行实现了sql解析器和执行器，将k-v存储映射到关系型数据库。
 
@@ -215,6 +215,16 @@ MySQL cluster是在关系型的基础上做分布式，使得实现复杂， 读
 主从架构读写：
 一般可以通过设置一主多从，读写分离提升读的性能，读的时候就只读从库，但是会出现数据不一致。 不一致的原因是从库同步数据有延时。
 <数据库主从不一致，怎么解？> https://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651961330&idx=1&sn=4bdbada3b26d4fc2fc505f7a0f2ad7c4&chksm=bd2d022e8a5a8b38e59f0dfffba7ca407fe8711644b3794832572dd822c665205bb820cdddf7&scene=21#wechat_redirect
+
+
+## mysql双主
+双主也是高可用的方案，两个节点，互为主备，对外只提供一个虚拟IP(vip),写的时候随机的写入到其中一个，另外一个会进行同步，所以同步是双向的。
+双主情况的数据一致性比主从架构的一致性要强，但仍然会有不一致的情况. 因为没有使用分布式一致性协议比如paxos,所有数据高可用方案都存在一致性问题，只能尽量避免，
+或者牺牲一定的可用性来保证一致性。 而mongodb副本集最开始用的一致性协议bully,后续版本用的是raft的扩展。
+
+考虑极端情况，不通过vip，而是分别直接连接节点IP同时进行操作，会怎么样？ 两边数据混合？
+
+<保证读库的高可用，但此时写库仍然是单点> https://mp.weixin.qq.com/s/sCjzzi9VXPk-JcWXySfHgw
 
 
 ## 分库分表与分区
@@ -327,9 +337,17 @@ INSERT IGNORE INTO test (id, name) VALUES (1,"hong"),(2, "ping"),(2,"kong"),(3,"
     查看autocommit是否开启： show variables like 'autocommit'\G
     关闭autocommit： set autocommit=off;
     无论是否开启，执行结果是一样的
-    
+ 
 参考：
 
     <58到家MySQL军规升级版> https://mp.weixin.qq.com/s/YfCORbcCX1hymXBCrZbAZg
     <InnoDB并发如此高，原因竟然在这？> https://mp.weixin.qq.com/s/R3yuitWpHHGWxsUcE0qIRQ
     <4种事务的隔离级别，InnoDB如何巧妙实现？> https://mp.weixin.qq.com/s/x_7E2R2i27Ci5O7kLQF0UA
+    
+
+## mysql 8.0
+mysql版本从5.7直接跳到8.0，MySQL 8.0发生了巨大的变化和修改。物理文件已更改。例如，*.frm，* .TRG，*.TRN和* .par 不再存在。添加了大量的新特性，
+如通用表表达式(Common Table Expressions CTE)，窗口函数（Window Functions），不可见索引（ Invisible Indexes），正则表达式（regexp）。
+MySQL8.0现在已经完全支持Unicode，且具有多字节安全特性。
+
+<MySQL性能基准测试对比：MySQL 5.7与MySQL 8.0> https://cloud.tencent.com/developer/article/1399045

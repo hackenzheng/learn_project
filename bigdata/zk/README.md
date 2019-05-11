@@ -1,9 +1,10 @@
 ## 安装
-    1. 在kafka中集成了zk,下载安装包之后直接启动
+   1. 在kafka中集成了zk,下载安装包之后直接启动
+   2. 单独安装
 
 ## 使用
-   连接zk: bin/zookeeper-shell.sh 127.0.0.1:2181，不支持命令补全，不支持上下历史命令查找
-   连接后的情况：比如之前创建了topic: mytopic,test，通过命令ls /brokers/topics可以列出来
+   连接zk: bin/zookeeper-shell.sh 127.0.0.1:2181，不支持命令补全，不支持上下历史命令查找.
+   连接后的情况：比如在kafka中创建了topic: mytopic,test，可以在zk里面通过命令ls /brokers/topics列出来.
    操作类似于文件系统中的操作，每个path都是一个节点，都可通过get指令查看里面存储的信息，
    可通过create创建新节点比如create -s /config "001"。
    
@@ -39,7 +40,10 @@
     setquota -n|-b val path
     
 ## zk功能与原理
-zk是分布式协调技术的一种实现，分布式锁也就是我们分布式协调技术实现的核心内容。
+zk本身使用副本模式解决了单点问题，并且解决主从架构下的分布式一致性问题，可以认为zk集群是可靠的，只要对外提供服务，那么就是可靠的。
+client可以直接连接到zk集群的follower节点，也能连到leader节点，所看到的数据，执行的操作都是一样的。
+主从节点的数据就是一致的。zk对外提供的服务是kv存储，类似于文件系统的存储，key是路径path，value是znode,文件节点，每个znode本身兼具文件和目录两种特点。
+在这基础之上，还提供了自动编号节点，watcher机制. zk提供这些基本的服务，在具体的应用中，结合自己的业务，使用zk可以实现选主，服务发现，配置共享，分布式锁等功能。
 
 1. 出现的原因及目标：
 
@@ -74,8 +78,7 @@ zk的服务器和客户端都被设计为严格检查并限制每个Znode的数�
 节点分为临时节点和持久节点，该节点的生命周期依赖于创建它们的会话。一旦会话(Session)结束，临时节点将被自动删除，当然可以也可以手动删除。
 另外又有顺序自动编号节点PERSISTENT_SEQUENTIAL，EPHEMERAL_SEQUENTIAL，这种目录节点会根据当前已近存在的节点数自动加 1
 
-zk作为选主的实现代替双机主备
-参考： https://www.cnblogs.com/wuxl360/p/5817471.html
+zk选主功能代替双机主备 https://www.cnblogs.com/wuxl360/p/5817471.html
 
 
 配置管理：
@@ -92,6 +95,55 @@ zk的每个操作都是原子的，但是有两步操作，那么就存在failed
 
 集群管理leader election： 通过EPHEMERAL_SEQUENTIAL 目录节点
 
+## zk数据存储
+Zookeeper的数据模型是树结构，在内存数据库中，存储了整棵树的内容，包括所有的节点路径、节点数据、ACL信息，Zookeeper会定时将这个数据存储到磁盘上。
+集群中的每个节点上的数据都是一样的，所以不能线性扩展，存储容量有限。但每个节点都能对外提供服务，所以并发性能是比较高的。
+
+多个客户端同时创建同一个节点，会只有一个客户端创建成功。 这一特性可以用来实现分布式锁，选主等功能。
+在zk中，事务是指能够改变zk服务器状态的操作。对每个事务请求，zk都会为其分配一个全局唯一的事务id,是顺序递增的。
+所有的事务操作都会转到leader进行处理，从而保证事务处理的顺序性。 每个事务操作都会记录一条日志到事务日志文件中。
+
+## zk集群状态
+在服务启动阶段，会进行数据磁盘的恢复，然后进行leader选举。leader选举成功后进行集群间的数据同步(follower与leader进行同步)。整个启动过程中zk都处于不可用的状态。
+    
+    第一阶段：Leader election（选举阶段）
+    最初时，所有节点都处于选举阶段，当其中一个节点得到了超过了半数节点的票数，它才能当选准Leader。只有达到第三阶段，准Leader才回变成实际的Leader。这一阶段Zookeeper使用的算法有Fast Leader Election。
+    
+    第二阶段：Discovery（发现阶段）
+    这个阶段中，Followers和准Leader进行通信，同步Followers最近最近接收的事务提议。这一阶段的主要目的是发现当前大多数节点接受的最新提议，并让Followers接收准Leader定义的epoch（相当于朝代号，每一代Leader会有自己的epoch）。
+    
+    第三阶段：Synchronization（同步阶段）
+    同步阶段主要是利用Leader前一阶段获得的最新提议历史，同步集群中的所有副本。只有当Quorum都同步完成，准Leader才回称为真的Leader。
+    
+    第四阶段：Broadcast（广播阶段）
+    这个阶段Zookeeper才能够正式对外提供事务服务，并且Leader可以进行消息广播。
+
+
+## zk的observer
+observer除了不参与投票，其他功能与follower一样，在zk3.3版本之后加入的。
+新增observer的目的是为了扩容读性能而不影响写性能。因为随着Follower节点数量的增加，ZooKeeper服务的写性能受到了影响。
+写的过程需要follower参与投票，follower数目越多，投票耗时越长，性能余越低。
+
+<ZooKeeper学习第八期——ZooKeeper伸缩性> http://www.cnblogs.com/sunddenly/p/4143306.html
+
+## zk读写数据流程
+写数据，一个客户端进行写数据请求时，如果是follower接收到写请求，就会把请求转发给Leader，Leader通过内部的Zab协议进行原子广播(类似2PC)，
+zab协议实现了类似2pc协议，就是先选主， 有了主之后的事务操作的数据同步使用的是提案，实际就是2pc.
+直到所有Zookeeper节点都成功写了数据后（内存同步以及磁盘更新），这次写请求算是完成，然后Zookeeper Service就会给Client发回响应。
+
+读数据，因为集群中所有的Zookeeper节点都呈现一个同样的命名空间视图（就是结构数据），上面的写请求已经保证了写一次数据必须保证集群所有
+的Zookeeper节点都是同步命名空间的，所以读的时候可以在任意一台Zookeeper节点上。
+
+
+<咱们一起聊聊Zookeeper> https://juejin.im/post/5b03d58a6fb9a07a9e4d8f01
+
+## 分布式锁的实现
+MySQL数据库： 利用数据库的主键功能，不同节点插入同一条数据，插入成功的就拿到锁，用的数据库本身的锁。 并发不够高，有单点问题
+redis: setnx key value指令，还能设置超时时间。 并发高，有可能导致锁泄露
+zk: 多个客户端创建同一个节点，创建成功的拿到锁。 目前最常用的方式。
+
+<分布式锁实现汇总> https://juejin.im/post/5a20cd8bf265da43163cdd9a
+
 ## zk在kafka中的作用
 Kafka通过Zookeeper管理集群配置，选举leader,以及在consumer group发生变化时进行rebalance.
 Kafka将元数据信息保存在Zookeeper中，但是发送给Topic本身的数据是不会发到Zk上的。
@@ -102,3 +154,6 @@ Producer端使用zookeeper用来"发现"broker列表,以及和Topic下每个part
 也就是说每个Topic的partition是由Lead角色的Broker端使用zookeeper来注册broker信息,
 以及监测partition leader存活性.Consumer端使用zookeeper用来注册consumer信息,其中包括consumer消费的partition列表等,
 同时也用来发现broker列表,并和partition leader建立socket连接,并获取消息.
+
+
+<一篇文章深入浅出理解zookeeper> https://juejin.im/entry/5bf378e5f265da615f76e1ee

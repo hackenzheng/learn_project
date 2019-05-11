@@ -74,7 +74,10 @@ k8s服务注册与发现：
     监听 API Server 中服务对象的变化，通过管理 iptables 来实现网络的转发。上面创建的服务只能在集群内部访问，
     如果希望有一个能直接对外使用的服务，可以使用 NodePort 或者 LoadBalancer 类型的 Service。nodePort 类型的服务会在所有的 worker
     节点（运行了 kube-proxy）上统一暴露出端口对外提供服务，也就是说外部可以任意选择一个节点进行访问,不仅仅是pod所运行的node.LoadBalancer 类型的服务需要公有云支持，如GCE、AWS。 
-
+    
+    <分布式(一) 搞定服务注册与发现 > https://crossoverjie.top/2018/08/27/distributed/distributed-discovery-zk/
+    
+    
 k8s存储：
 
     最简单的是使用docker的挂载方式volume,将本地或者分布式存储等挂载到某个目录,不够灵活.

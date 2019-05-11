@@ -28,3 +28,28 @@ Redis 集群为了保证一致性（consistency）而牺牲了一部分容错性
     <缓存，究竟是淘汰，还是修改？> https://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651961313&idx=1&sn=60d74fdbc1fb1dae696e0f4997c09f21&chksm=bd2d023d8a5a8b2bba2f8a3807492771a442495d27323d8dbfae670508fd0c46780308a9280d&scene=21#wechat_redirect
     <缓存相关的整体介绍> https://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651961368&idx=1&sn=82a59f41332e11a29c5759248bc1ba17&chksm=bd2d0dc48a5a84d293f5999760b994cee9b7e20e240c04d0ed442e139f84ebacf608d51f4342&scene=21#wechat_redirect
 
+
+## 一致性哈希
+在分布式集群中，要有足够的容错(节点故障)和扩容(新增节点)能力，无状态的服务天然支持，而对于有状态的服务比如数据库和缓存redis等，
+在分区存储的情况下首先保证同一个数据映射到同一台服务器，一般用hash取模，在这之上很好的支持容错和扩容，就要一致性哈希。
+
+一致性哈希是将整个哈希值空间组织成一个虚拟的圆环，圆环的大小一般是2的n次方，实现的时候就用一个数组就可以。首先对服务器(ip或name)取hash确定在环
+的位置上，数据过来用同样的hash函数取hash值，根据hash值落到顺时针方向第一个服务器上。这样解决了扩容时对所有数据重新hash的问题，只需要对一个节点上的数据重hash.
+
+但还存在数据倾斜的问题，于是又引入了虚拟节点。
+
+<一致性哈希算法及其在分布式系统中的应用> http://blog.codinglabs.org/articles/consistent-hashing.html
+<一致性哈希的Java实现> https://github.com/crossoverJie/JCSprout/blob/master/docs/algorithm/consistent-hash-implement.md
+
+
+## redis cluster中的分区方法
+redis cluster是官方推出的去中心化的集群方案，每个节点存储一部分数据，数据划分通过手动预分桶(slot)的方式，总共是16384个桶。
+预分桶的方案介于“硬Hash”和“一致性Hash”之间，牺牲了一定的灵活性，但相比“一致性Hash“，数据的管理成本大大降低
+
+客户端与redis节点直连,不需要中间proxy层.客户端不需要连接集群所有节点,连接集群中任何一个可用节点即可
+
+在redis cluster出来之前如果要用redis的分布式集群方式需要自行实现一致性哈希，既可以在客户端实现，也可以在中间件上实现，使用中间件比较好，
+比如twitter的twemproxy,以及开源的codis.
+
+<redis集群方案-一致性hash算法> https://blog.csdn.net/u014490157/article/details/52244378
+<Redis分布式部署，一致性hash> https://www.cnblogs.com/taosim/articles/4238674.html

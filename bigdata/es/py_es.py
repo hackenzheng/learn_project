@@ -188,11 +188,11 @@ if __name__ == "__main__":
     parser.add_argument('--es', default=False, action='store_true', help='whether search')
     args = vars(parser.parse_args())
 
-    if args['makefile']:   # 如果命令中要产生文件
+    if args['makefile']:
         for i in range(tablenum):
             es.make_base64_file(table_filenum,'data/data'+str(i),index_src+str(i),type_src+str(i),field_src+str(i))
 
-    if args['delindex']:  # 如果命令中要删除index
+    if args['delindex']:
         es.remove_index('*')
         for i in range(tablenum):
             index=index_src+str(i)
@@ -216,7 +216,7 @@ if __name__ == "__main__":
     if args['importfile']:
         print('start to import')
         # curl localhost:9200/_cat/indices?v
-        for i in range(0, 1):  # int(args['tablenum'])
+        for i in range(0, int(args['tablenum'])):
             es.import_data_from_file(table_filenum, 'data/data' + str(i))
 
     # es.get_field(index_src + str(0), type_src + str(0), id=502)  # 根据id查询field的值

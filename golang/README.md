@@ -55,6 +55,7 @@ vscode安装： 从官网下载deb包，直接安装
 
 ## 参考资料
 <go-web编程中文版>https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md
+<腾讯 go语言最佳实践>https://cloud.tencent.com/developer/article/1145176
 
 ## 并发
 go的协程goroutine比起线程使用起来更方便更轻量，能替代线程的使用，并配套了channel用于通信作同步。

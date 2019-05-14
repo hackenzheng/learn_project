@@ -75,7 +75,6 @@ k8s服务注册与发现：
     如果希望有一个能直接对外使用的服务，可以使用 NodePort 或者 LoadBalancer 类型的 Service。nodePort 类型的服务会在所有的 worker
     节点（运行了 kube-proxy）上统一暴露出端口对外提供服务，也就是说外部可以任意选择一个节点进行访问,不仅仅是pod所运行的node.LoadBalancer 类型的服务需要公有云支持，如GCE、AWS。 
     
-    <分布式(一) 搞定服务注册与发现 > https://crossoverjie.top/2018/08/27/distributed/distributed-discovery-zk/
     
     
 k8s存储：
@@ -98,3 +97,14 @@ k8s资源和调度：
     namespace是用于资源隔离, cgroup是用于资源控制和隔离, 控制是限制每个容器的资源占用,避免不同容器间资源争抢
     
     可以指定调度器 
+    
+    
+## 服务注册与发现
+服务注册与发现， 服务名对应到提供服务的地址，但服务是要做到自动扩缩容，并实现负载均衡，这样就会要求服务列表是变化的，
+服务列表变化后要能主动通知到上游的调用方
+
+最简单的Nginx/Apache这些都能做（域名转向，proxy），或者你要写个name : address的对应关系到db里面也完全可以，再配一个定时healthcheck的服务，
+最简单的服务发现也就行了。高级点用到zookeeper/etcd等等，或者SpringCloud全家桶，那只是简化配置，原理都一样
+
+
+<分布式(一) 搞定服务注册与发现 > https://crossoverjie.top/2018/08/27/distributed/distributed-discovery-zk/

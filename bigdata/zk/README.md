@@ -157,3 +157,4 @@ Producer端使用zookeeper用来"发现"broker列表,以及和Topic下每个part
 
 
 <一篇文章深入浅出理解zookeeper> https://juejin.im/entry/5bf378e5f265da615f76e1ee
+<使用Go基于zookeeper编写服务发现> https://juejin.im/post/5ab45e2751882510fd3f8d1e

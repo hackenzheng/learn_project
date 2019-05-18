@@ -1,16 +1,12 @@
-多进程常用的通信方式：
-文件
-管道pipe
-以太网套接字
-unix域套接字
-无名套接字socketpair
-有名管道fifo
-OS消息队列
-共享内存
-中间件消息队列redis等
+## 二进制和文本
+
+三个问题：
+
+二进制文件和文本文件
+二进制传输和文本传输
+序列化之后是哪种？
 
 
-例子： Python使用多进程完成计算密集型任务pi的计算，通信模式有多种，参考
-<Python广为使用的并发处理库futures使用入门与内部原理> https://juejin.im/post/5b1e36476fb9a01e4a6e02e4
-<Python多进程编程基础——图文版> https://juejin.im/post/5b0a88b4f265da0db06e4385
-<深入Python进程间通信原理--图文版> https://juejin.im/post/5b0abab451882538c220440b
+<二进制文件与文本文件的区别，tcp流传输与二进制流区别> https://blog.csdn.net/dongchongyang/article/details/79044082?utm_source=blogxgwz0
+<C++ socket编程——3种方法发送不同类型的数据> https://blog.csdn.net/ikerpeng/article/details/38387171
+<文本文件序列化和二进制序列化> https://blog.csdn.net/chufuying3/article/details/61640158

@@ -11,7 +11,7 @@ class PyRedis(object):
     def __init__(self, db=0):
         #pool = redis.ConnectionPool(host='localhost', port=6379, decode_responses=True)
         #self.redis_obj = redis.Redis(connection_pool=pool)
-        self.redis_obj = redis.Redis(host=REDIS_IP, port=REDIS_PORT, db=db)
+        self.redis_obj = redis.Redis(host=REDIS_IP, port=REDIS_PORT, db=db)  # 默认使用个连接池还是需要先创建连接池？
 
     def close(self):
         pass

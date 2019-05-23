@@ -89,7 +89,7 @@ epoll事先通过epoll_ctl()来注册一个文件描述符，一旦基于某个�
 
 
 
-## 特别注意
+## tcp状态
 
 服务端只要listen之后就能够监听客户端的请求你，比如在listen和accept之间睡眠，此时客户端请求过来，
 是可以建立连接的， accept只是从连接的队列中取出最早建立的
@@ -112,6 +112,64 @@ epoll事先通过epoll_ctl()来注册一个文件描述符，一旦基于某个�
 
 
 
-time_wait状态： 是什么：是主动关闭的一端有的状态，正常关闭的情况下就会出现； 作用是：等
-带来的负面影响有： 服务端要为每个正常关闭的连接都要维护这么一个状态，降低了资源利用率，2msl目前一般是1分钟的时间。
-如果服务端出现大量time_wait状态怎么处理： 设置msl时间更小，或者设置端口复用。
+time_wait状态： 
+
+    是什么：是主动关闭的一端有的状态，正常关闭的情况下就会出现； 
+    作用是： (1)让ack能够到达对端，如果没有到达对端会重发fin包，所以需要等待再处理，即可靠地实现TCP全双工连接的终止; 
+    (2)经过2MSL，上一次连接中所有因超时重发的包都会消失，避免影响下一个连接， 这个重发的包不只是关闭过程中重发的。
+    也就是下一个连接的四元组即使都相同，不会出现上一个四元组的包来干扰。MSL是最长分节生命(maximum segment lifetime).
+    每个ip数据包都有一个跳数限制(TTL)字段，尽管这是一个跳数限制字段而不是真正的时间限制，我们仍然假设具有最大跳数限制的分组
+    在网络中存在的时间不可能超过2MSL.  也就是IP分组不会无限制的在网络中传输，如果超过一定的限制还没到路由器就不转发。
+    带来的负面影响有： 服务端要为每个正常关闭的连接都要维护这么一个状态，降低了资源利用率，2msl目前一般是1分钟的时间。
+    如果服务端出现大量time_wait状态怎么处理： 设置msl时间更小，或者设置端口复用。 time_wait是连接正常关闭的情况下也会出现，只能从系统层面优化，与代码无关。
+    
+    共有三个状态会进入time_wait状态： CLOSING,FIN_WAIT_1,FIN_WAIT_2
+    
+    <Unix 网络编程 TCP状态转换图详解> https://blog.csdn.net/wenqian1991/article/details/40110703
+    
+    具体的内核参数修改:
+    vi /etc/sysctl.conf
+    
+    # 加入以下内容
+    net.ipv4.tcp_syncookies = 1
+    net.ipv4.tcp_tw_reuse = 1
+    net.ipv4.tcp_tw_recycle = 1
+    net.ipv4.tcp_fin_timeout = 30
+    net.ipv4.tcp_timestamps
+    
+    /sbin/sysctl -p   让参数生效
+    
+    # 查看修改后的值
+    cat /proc/sys/net/ipv4/tcp_syncookies
+    cat /proc/sys/net/ipv4/tcp_tw_reuse
+    cat /proc/sys/net/ipv4/tcp_tw_recycle
+    cat /proc/sys/net/ipv4/tcp_timestamps
+    
+    net.ipv4.tcp_syncookies = 1表示开启SYN Cookies。当出现SYN等待队列溢出时，启用cookies来处理，可防范少量SYN攻击，默认为0，表示关闭；
+    net.ipv4.tcp_tw_reuse = 1表示开启重用。允许将TIME-WAIT sockets重新用于新的TCP连接，默认为0，表示关闭,是四元组完全相同
+    net.ipv4.tcp_tw_recycle = 1表示开启TCP连接中TIME-WAIT sockets的快速回收，默认为0，表示关闭。
+    net.ipv4.tcp_fin_timeout修改系統默认的TIMEOUT时间
+    1、开启tcp_timestamp是开启tcp_tw_recycle，tcp_tw_reuse和tcp_timestamp的前提条件。
+    2、但是在nat模式下，不用将tcp_tw_recycle和tcp_timestamp同时开启，这会造成tcp超时引发故障。
+    
+close_wait状态：
+    
+    被动关闭的一端再接收到FIN包之后就进入到该状态，然后回个ACK。在调用close之前都是这个状态。
+    之所以叫 CLOSE_WAIT 可以理解为被动关闭的一方此时正在等待上层应用程序发出关闭连接指令即调用close().
+    
+    time_wait和close_wait状态的出现不能说是客户端和服务端，得是说主动关闭的一端和被动关闭的一端。
+    因为客户端和服务端都可以主动关闭也都可以被动关闭。 一般的情况是服务端会处理多个连接，所以大量的time_wait状态和大量的close_wait
+    状态连接的情况指的是服务端，除非客户端是做压力测试用或者做爬虫，会发起大量连接。
+    
+    close_wait状态的大量出现与代码有关，因为对端发了fin包要求结束，但自己这边如果不想结束就会一直处于这个状态。 但如果自己这边本来要结束，
+    却没有结束即忘了close就去做其他的事情去了，进程没有立即结束，那么就会导致大量的close_wait出现。 比如在websocket中，客户端关闭了连接，
+    但服务端这边没有close调，如果是单进程模式下，进程一直存活连接就一直不会释放。
+    
+    <服务器TIME_WAIT和CLOSE_WAIT详解和解决办法> https://www.cnblogs.com/sunxucool/p/3449068.html
+
+
+
+## 端口复用
+<Linux网络编程——端口复用（多个套接字绑定同一个端口）> https://blog.csdn.net/tennysonsky/article/details/44062173
+
+复用真正的作用是在time_wait状态的处理

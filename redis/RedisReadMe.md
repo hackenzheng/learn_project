@@ -55,3 +55,34 @@ redis cluster是官方推出的去中心化的集群方案，每个节点存储�
 
 <redis集群方案-一致性hash算法> https://blog.csdn.net/u014490157/article/details/52244378
 <Redis分布式部署，一致性hash> https://www.cnblogs.com/taosim/articles/4238674.html
+
+## 布隆过滤器
+用于判断一个元素在不在库里面，如果判断结果不在库里面那就一定不在，如果在库里面，有一定的错误率是不在的。
+判断一个元素在不在最直接的方式使用hash,但如果数据量比较大，使用hash很耗存储，所以使用布隆过滤器，用一定的误报率换取存储空间。
+
+edis 在 4.0 的版本中加入了 module 功能，布隆过滤器可以通过 module 的形式添加到 redis 中，所以使用 redis 4.0 以上的版本
+可以通过加载 module 来使用 redis 中的布隆过滤器。但是这不是最简单的方式，使用 docker 可以直接在 redis 中体验布隆过滤器。
+
+    > docker run -d -p 6379:6379 --name bloomfilter redislabs/rebloom
+    > docker exec -it bloomfilter redis-cli
+    
+redis 布隆过滤器主要就两个命令：
+
+    bf.add 添加元素到布隆过滤器中：bf.add urls https://jaychen.cc。
+    bf.exists 判断某个元素是否在过滤器中：bf.exists urls https://jaychen.cc。
+
+上面说过布隆过滤器存在误判的情况，在 redis 中有两个值决定布隆过滤器的准确率：
+
+    error_rate：允许布隆过滤器的错误率，这个值越低过滤器的位数组的大小越大，占用空间也就越大。
+    initial_size：布隆过滤器可以储存的元素个数，当实际存储的元素个数超过这个值之后，过滤器的准确率会下降。
+
+redis 中有一个命令可以来设置这两个值：
+
+    bf.reserve urls 0.01 100
+    复制代码三个参数的含义：
+    
+    第一个值是过滤器的名字。
+    第二个值为 error_rate 的值。
+    第三个值为 initial_size 的值。
+
+另外可以基于redis的bitmap实现布隆过滤器，而不是直接使用redis的布隆过滤器

@@ -18,18 +18,19 @@ typedef struct listNode{
 
 listNode * reverseList(listNode * head)
 {
-    if(head == NULL || head->next == NULL)
+    if(head == NULL)
         return head;
     listNode * newHead=NULL;   //直接newHead->next会出段错误
     listNode * p=head->next;
 
     // 假定newhead是已经反转部分的头节点，那么从这个位置开始的操作只要四部，然后就是链表的初始化。
-    while(head->next)      //单个节点就不适用
+    while(head)   // 需要考虑到最后一个节点
     {
         head->next = newHead;
         newHead = head;
         head = p;
-        p=p->next;
+        if (p != NULL)
+            p=p->next;    // 最后一个节点就不往下走
 
     }
     return newHead;

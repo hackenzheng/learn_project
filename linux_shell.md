@@ -56,11 +56,11 @@ ubuntu下service、systemctl和/etc/init.d的关系：
 
     都是跟系统服务有关，/etc/init.d目录下是开机自启动脚本,比如重启网卡可以是/etc/init.d/networking restart
     service命令本身也是shell脚本,它会去/etc/init.d目录下查找对应服务的脚本然后启动,比如service networkking restart
-    systemctl是新的机制,融合了service和chkonfig,所有service能够管理的服务systemctl也可以，使用方式是systemctl restart networking.service,
-    每个服务后面都要跟.service.sysctl配置与显示在/proc/sys目录中的内核参数,是改变内核参数的，与系统服务无关
-    能够使用service命令进行操作的，就是已经注册成为linux的系统服务了，也就是service只对系统服务有效。注册为系统服务，可以方便的用service进行管理，
-    不需要写一大串原始路径。把服务名放到/etc/rc.d/init.d目录中，就成了系统服务，比如httpd,network, service本身是一个shell脚本。centos7中已经用
-    systemctl替换了service和chkconfig，service仍然能够使用。service http start，systemctl start httpd.service.   
+    
+    systemctl是新的机制,替换了service和chkconfig，service仍然能够使用,所有service能够管理的服务systemctl也可以，使用方式是systemctl restart networking.service,
+    每个服务后面都要跟'.service'. 能够使用service命令进行操作的，就是已经注册成为linux的系统服务了，也就是service只对系统服务有效。注册为系统服务，
+    可以方便的用service进行管理，不需要写一大串原始路径。把服务名放到/etc/rc.d/init.d目录中，就成了系统服务，比如httpd,network, 
+    service本身是一个shell脚本。sudo /etc/init.d/http restart/service http start/systemctl start httpd.service三种方式是一样的.   
     有时会自己编写一个脚本/usr/sbin/startall，将/etc/init.d下的服务全部启动。 
 
 进程卡住的排查思路： 
@@ -78,3 +78,18 @@ linux默认定时执行的任务只有hour,day,week,monthly，如果要增加每
 挂载mount的方式将共享的目录挂载到本地，比如 mount 192.168.1.2:/home/zhg /mnt/zhg,这样就可以跟访问本地文件系统一样访问nfs服务器上的。
 
 
+
+## vi
+vi的可视化模式有三种：
+
+    用 v 命令进入的字符可视化模式
+    用 V 命令进入的行可视化模式
+    用 ctrl-V 进入的块可视化模式(列模式)
+    重复按一次或者esc退出到单行命令模式
+    
+    可视化模式下的操作：
+    y 复制
+    p 粘贴
+    x 剪切
+    I 列插入状态
+    d只删除选中的字符，而D删除选中字符所在行的所有字符，c 和 C ， y 和 Y 同理

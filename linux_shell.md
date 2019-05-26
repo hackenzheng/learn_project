@@ -20,7 +20,7 @@
     find ./ -name "*.html" -maxdepth 1|grep -v 'index.html'|xargs rm -f  
     
     du -h -d 1
-    lsof | grep delete    #已经被删除但是仍被使用的文件是
+    lsof | grep delete    #已经被删除但是仍被使用的文件
     echo "" >> file       #在线清空文件,rm只是删除了文件名与inode的link关系
 
 netstat:

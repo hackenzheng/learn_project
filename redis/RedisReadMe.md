@@ -86,3 +86,11 @@ redis 中有一个命令可以来设置这两个值：
     第三个值为 initial_size 的值。
 
 另外可以基于redis的bitmap实现布隆过滤器，而不是直接使用redis的布隆过滤器
+
+
+## redis存储中文
+set chinese 中国 将编码成*3\r\n$3\r\nSET\r\n$7\r\nchinese\r\n$6\r\n\xe4\xb8\xad\xe5\x9b\xbd\r\n，
+汉字中国的按照utf-8编码的方式编码成bytes为*\xe4\xb8\xad\xe5\x9b\xbd，一个汉字三个字节，因此中国的长度是6。
+get chinese返回的也是"中国"的utf-8编码。
+
+执行上述命令的过程中，使用sudo tcpdump -i any port 6379 -vv 抓包可以看到传输的内容， 英文字符都能直接看到，而中文字符看起来是乱码。

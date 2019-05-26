@@ -19,8 +19,8 @@
 
   
  
-GET和POST一个重大区别，GET产生一个TCP数据包;POST产生两个TCP数据包。长的说：对于GET方式的请求，浏览器会把http header和data一并发送出去，
-服务器响应200(返回数据);而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok(返回数据)。
+GET和POST一个重大区别，GET产生一个TCP数据包，浏览器会把http header和data一并发送出去服务器响应200(返回数据);POST产生两个TCP数据包，
+浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok(返回数据)。
 
 
 域名设置的默认的DNS返回的应答就是权威应答，从本地DNS（本地运营商的dns或者设定的dns）的缓存中拿到的就是非权威应答。通过ISP接入了互联网，

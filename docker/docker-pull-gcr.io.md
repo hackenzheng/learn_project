@@ -36,7 +36,7 @@ docker代理设置：
 
 
 
-## 阿里云镜像仓库
+## 阿里云镜像仓库使用
 登录到阿里云的容器镜像服务管理控制台，如果registry的密码忘了，在访问凭证的地方可以重置
 
 创建命名空间，在命名空间里面再创建镜像。可以手动创建镜像，并指定镜像从哪里构建，比如是github还是gitlab。
@@ -49,9 +49,16 @@ sudo docker login --username=hackenzheng registry.cn-shenzhen.aliyuncs.com
 将本地的镜像重新tag:
 sudo docker tag gcr.io/ml-pipeline/persistenceagent:0.1.16 registry.cn-shenzhen.aliyuncs.com/kfp/persistenceagent:0.1.16
 
-
 推送到云端，这样在公有镜像里面就能够搜索到
 sudo docker push registry.cn-shenzhen.aliyuncs.com/kfp/persistenceagent:0.1.16
+
+
+## 使用dockerhub拉取gcr.io的镜像
+使用dockerhub作为代理，能够拉取gcr.io等被墙的镜像，dockerhub注册时的验证码也需要翻墙才能刷出来，正常的登录不用。
+步骤是：
+
+    将github关联到dockerhub, 并设置自动构建
+    编写Dockerfile，Dockerfile只需用一行代码，FROM gcr.io/google_containers/example-guestbook-php-redis:v3，提交到github
 
  
 

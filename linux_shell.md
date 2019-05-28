@@ -93,3 +93,19 @@ vi的可视化模式有三种：
     x 剪切
     I 列插入状态
     d只删除选中的字符，而D删除选中字符所在行的所有字符，c 和 C ， y 和 Y 同理
+    
+
+## git
+tag 就是提交的别名，和branch无关系
+
+1.在本地的分支当中操作，先只有master分支，然后git tag v0.1,再git checkout -b dev切换到dev分支，在dev分支下也可以看到tag
+
+2.在本地的分支当中操作，先只有master，然后git checkout -b dev, 在dev分支下再git tag v0.1,再切换到master分支，仍然可以看到tag.
+
+在多个分支的情况下，在不同分支下git tag添加的分支在其他分支是可以看到的, 任何时候git tag看到的都是全局的tag, 即使把创建tag时等待分支
+删除了，tag也还存在。
+
+在本地分支打的tag默认不会push到远端，需要显式提交 git push origin –tags # 将本地所有标签一次性提交到git服务器
+
+
+

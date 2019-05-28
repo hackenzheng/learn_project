@@ -55,10 +55,12 @@ sudo docker push registry.cn-shenzhen.aliyuncs.com/kfp/persistenceagent:0.1.16
 
 ## 使用dockerhub拉取gcr.io的镜像
 使用dockerhub作为代理，能够拉取gcr.io等被墙的镜像，dockerhub注册时的验证码也需要翻墙才能刷出来，正常的登录不用。
+
 步骤是：
 
-    将github关联到dockerhub, 并设置自动构建
-    编写Dockerfile，Dockerfile只需用一行代码，FROM gcr.io/google_containers/example-guestbook-php-redis:v3，提交到github
+    将github关联到dockerhub, 新建一个repository，在build里面设置自动构建，需要设置build context(用于指定子目录)和dockerfile location
+    编写Dockerfile，以grc.io等镜像为基础镜像，FROM gcr.io/google_containers/example-guestbook-php-redis:v3，提交到github就会自动触发构建，
+    也可以手动触发构建。
 
  
 

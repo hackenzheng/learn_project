@@ -49,9 +49,9 @@
    
    列簇的设计：列簇是在建表的时候定义好，最多两个，列可以随时添加
 
-hbase不支持join，因为hbase支持的列数足够大，足够在一个表里面存储所有的信息，不需要拆分。
+hbase不支持join，因为hbase支持的列数足够大，足够在一个表里面存储所有的信息，不需要拆分。Phoenix帮助Hbase提供了SQL语法的支持，使难用的Hbase变得简单易用。
 
-## zk
+## zk的作用
 zk在hbase中最大的功能是检测某个节点是否宕机， 检测的方式是每个节点上线时都会向zk注册，建立一个session，如果机器宕机，这个session就会过期。
 HMaster主要维护系统表-ROOT-.META.(该表记录regionserver和region对应信息)。hmaster启动时候会将hbase 系统表-ROOT- 加载到 zookeeper cluster，
 hbase regionserver则用于多个/单个region维护。region则对应为hbase数据表的表分区数据维护
@@ -61,3 +61,38 @@ hbase regionserver则用于多个/单个region维护。region则对应为hbase�
     https://mp.weixin.qq.com/s/r_ouxFJ4FajyDl835iEcBQ
     <hbase 不睡觉书>
     
+
+## hbase和es结合
+hbase是海量kv数据库，es本质也是个数据库，偏搜索，可以将两者结合起来解决海量数据存储与查询的问题，具体数据存在hbase，es里只存在hbase查询的索引。
+hbase本身不支持二级索引，一般都是hbase+solr/es或者hbase集成Phoenix才支持二级索引。
+
+es和hbase结合的方式有两种，1是hbase和es存放相同的数据，使用hbase协处理器达到数据一致性，这种方案存在数据冗余问题，在 ES 这边需要准备大量的存储空间。
+另外一种是使用 ES 作为二级索引的实现，使用协处理将需要查询的表查询字段与 RowKey 关系保存到 ES，查询数据的时候，先根据条件查询 ES 得到 RowKey，
+通过得到的 RowKey 查询 HBase 数据。以提高查询的效率。Anyway，这两种方案都需要解决历史数据的问题和还有需要注意数据更新操作以及es和hbase数据一致性问题。
+
+常见的使用场景可总结为：需要保存大数据量数据，查询条件的字段数据仅占原数据的一小部分，并且需要各种条件组合查询，还可能会使用高并发KV精确查询。
+比如各种网站会员、商品信息检索场景，一般保存大量的商品/会员信息，并需要根据少量条件进行复杂且任意的查询，以满足网站用户任意搜索需求等
+
+数据同步过程
+    
+    hbase的一行数据作为一个document插入到es, rowkey转换为documentid
+
+
+数据查询过程：
+    
+    client先根据条件向es查询到documentid, 转成rowkey后直接从hbase获取数据
+
+
+
+< 分库分表技术演进暨最佳实践 最终方案是es+hbase > https://mp.weixin.qq.com/s/DahF7Epx6MG95ZbxrMka2Q
+
+<HBase 2.0 协处理器实现 ES 数据同步> https://zoeminghong.github.io/2019/01/30/HBase_2.0_%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E7%8E%B0/
+
+<hbase 检索优化 hbase for solr> https://mp.weixin.qq.com/s?__biz=MzU5OTQ1MDEzMA==&mid=2247484665&idx=1&sn=0f5ef7df76ffe533f30a83a3d271b4f7&scene=21#wechat_redirect
+
+## 协处理器
+HBase 0.92版本后推出了Coprocessor — 协处理器，一个工作在Master/RegionServer中的框架，能运行用户的代码，从而灵活地完成分布式数据处理的任务。
+HBase 支持两种类型的协处理器，Endpoint 和 Observer。
+
+Endpoint 协处理器类似传统数据库中的存储过程，客户端可以调用这些 Endpoint 协处理器执行一段 Server 端代码，并将 Server 端代码的结果返回给客户端进一步处理，最常见的用法就是进行聚集操作。
+Observer Coprocessor，这种协处理器类似于传统数据库中的触发器，当发生某些事件的时候这类协处理器会被 Server 端调用。

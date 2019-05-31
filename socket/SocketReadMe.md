@@ -175,3 +175,4 @@ close_wait状态：
 <Linux网络编程——端口复用（多个套接字绑定同一个端口）> https://blog.csdn.net/tennysonsky/article/details/44062173
 
 复用真正的作用是在time_wait状态的处理
+

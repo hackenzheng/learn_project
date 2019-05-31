@@ -287,7 +287,7 @@ MySQL cluster是在关系型的基础上做分布式，使得实现复杂， 读
     <数据库架构设计与业务的变化> https://mp.weixin.qq.com/s/qbVrQ_aUdL9k28XVinpJXA
     <三篇文章了解 TiDB 技术内幕 - 说计算> https://pingcap.com/blog-cn/tidb-internal-2/
     <大众点评订单系统分库分表实践> https://tech.meituan.com/2016/11/18/dianping-order-db-sharding.html
-
+    
 ## mysql 数据存储
 启动MySQL时需要指定数据目录，该目录用于存放binlog,表数据等。每新建一个库，就会有一个与库名同名的目录。
 
@@ -427,3 +427,24 @@ postgresql日期数据类型：
 UTC时间是世界协调时间（又称世界标准时间），在一般精度要求下，它与GMT（格林威治标准时间）是一样的，其实也就是说 GMT≈UTC，但 UTC 是以原子钟校准的，更精确。本地时间 = UTC + 时区
 
 <Linux操作系统时间与BIOS硬件时间>  https://www.cnblogs.com/ajianbeyourself/p/4189520.html
+
+
+## pgsql中文存储
+在postgresql中，中文是以中文编码的方式存储在服务端，比如'中文'两个字实际存储为utf-8为'\u4e2d\u6587'。
+pgsql支持简体中文有四种编码：EUC_CN（Extended UNIX Code-CN）、GB18030、GBK和UTF-8。但GB18030和GBK只能作为客户端编码，不能设置为服务端编码,服务端一般都用utf-8.
+
+查看pg客户端字符编码: show client_encoding；
+查看pg服务端字符编码: show server_encoding。
+
+python中对utf-8的处理
+
+    1 >>> s = u'\u4e2d\u6587'
+    2 >>> print s
+    3 中文
+    1 >>> s = '\u4e2d\u6587'    
+    2 >>> print s
+    3 中文
+    
+    Python3中默认就是utf-8编码，是否前缀u''不影响
+    
+<PostgreSQL 字符集问题> https://www.douban.com/note/331854618/

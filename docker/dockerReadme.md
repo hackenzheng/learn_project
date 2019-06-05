@@ -28,6 +28,24 @@ ubuntu docker安装：
     
 ENTRYPOINT不能被覆盖，CMD可以被覆盖，如果用的是ENTRYPOINT调试的时候可以是docker run -it --entrypoint=/bin/bash feiyu/entrypoint:1
 
+相关操作：
+
+查看docker中运行的进程在宿主机上对应的pid:  docker inspect -f '{{ .State.Pid }}' container_id
+
+本地和容器之间拷贝数据 sudo docker cp host_path containerID:container_path
+
+删除为none的image  
+
+    sudo docker rmi $(sudo docker images | grep none | awk '{print$3}')
+    sudo docker rm $(sudo docker ps -a | grep Exited | awk '{print$1}')
+    sudo docker rmi $(sudo docker images | grep none | grep weeks | awk '{print$3}')
+    kubectl delete pod -n kubeflow $(kubectl get pods -n kubeflow | grep new-train-test | grep Error | awk '{print$1}')
+
+强制删除pod:  kubectl delete pod -n tsest gput  --grace-period=0 --force
+
+k8s中pod重启进程： kill -9 $(ps -ef | grep gunicorn | sed -n '2p' |awk '{print$2}')
+
+清理资源 docker system prune -a
 
 ## docker存储目录修改或扩容
 
@@ -39,11 +57,11 @@ docker 默认的存储路径在 /var/lib/docker下面,当镜像和容器比较�
 
 将已有的文件从/var/lib/docker移动到 /home/docker:
 
-    cp -R /var/lib/docker/* /home/docker/            
+    cp -R /var/lib/docker/* /home/docker/     # 用mv会提示文件不存在
 
 修改docker的systemd的 docker.service的配置文件:
 
-    vim /usr/lib/systemd/system/docker.service
+    vim /usr/lib/systemd/system/docker.service  或者/etc/systemd/system/multi-user.target.wants/docker.service
     在EXECStart后面增加新的路径
     ExecStart=/usr/bin/dockerd --graph /home/docker
     

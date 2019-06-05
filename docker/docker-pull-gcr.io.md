@@ -34,7 +34,7 @@ docker代理设置：
     
 直接用别人封装好的代理，没有试过： https://mritd.me/2017/02/09/gcr.io-registy-proxy/
 
-
+registry.cn-hangzhou.aliyuncs.com/google_containers 替换 gcr.io
 
 ## 阿里云镜像仓库使用
 登录到阿里云的容器镜像服务管理控制台，如果registry的密码忘了，在访问凭证的地方可以重置

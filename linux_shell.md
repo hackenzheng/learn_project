@@ -94,6 +94,10 @@ vi的可视化模式有三种：
     I 列插入状态
     d只删除选中的字符，而D删除选中字符所在行的所有字符，c 和 C ， y 和 Y 同理
     
+vim插件配置： spacevim 或 spf-13 vim 或youcompleteme+ctag
+
+复制缩进问题： :set paste
+
 
 ## git
 
@@ -120,9 +124,35 @@ tag 就是提交的别名，和branch无关系
     1.将远程的代码clone到本地仓库 
     2.将本地的代码手动关联到远程仓库，可以关联到多个远程仓库，默认第一个是origin，其他仓库用其他名字用于区分
     git remote add origin git@github.com:hackenzheng/test.git 关联到本地仓库，本地仓库的别名是origin也可以用其他，真实地址是git@github.com...
-    
+
+git其他操作：
+
+    git remote prune origin   # 跟新远端分支信息
+    git checkout -b  test  会以当前分支建立一个新分支test并切换过去
+    git branch test  #是从本地当前分支检出来的，而不是从远端
+    git checkout origin/dev1.0 -b test  #切换到远端dev1.0分支，并在本地创建test分支关联到远端，一定要在本地新建个分支与远端关联，本地分支只能关联一个远端分支，不能切换远端分支
 
 
+## 免密ssh登录
+ssh认证方式有密码和秘钥两种方式， 将本机公钥放到对端，ssh及scp的时候就不用输密码
 
+步骤：
 
+    生成密钥对 ssh-keygen -t rsa  会在用户home目录下生成.ssh文件夹，如果已经有了就不用再生成
+    拷贝秘钥 ssh-copy-id -i ~/.ssh/id_rsa.pub zhenghg@192.168.2.177
+    给服务器设置别名 vi .ssh/config 添加如下四行
+    Host z177     # 服务器别名，以后就可以ssh z177即可
+    HostName 192.168.2.177
+    User zhenghg
+    IdentitiesOnly yes
 
+ssh -o ServerAliveInterval=30 z177  定时连接，避免服务中断
+
+## ubuntu可视化
+ssh到Ubuntu服务器能够显示图片等使用ssh -X模式
+
+vnc第一次连接灰屏的解决方法，修改xstartup配置，https://bbs.csdn.net/topics/392040167
+对16.04的系统，帖子安装的软件不全，而且要对xstartup文件添加可执行权限
+上运行xhost + 表示任意ip都能连上xserver gnome-panel
+
+vnc启动： vncserver -name zhg -geometry 1920x1080 -pixelformat RGB888 -depth 24

@@ -3,6 +3,10 @@
 学习环境 用有minikube, k8s-for-desktop等项目。集群环境部署方式可以用rancher，kubeadm,kubespray, ansible等方式。
 rancher最简单，屏蔽了很多过程，如果要学习安装过程中需要的组件可以用二进制的kubeadm。
 
+kubespray因为使用到了gcr.io镜像，需要翻墙或者替换镜像。kubeadm是Kubernetes官方提供的k8s部署工具，不过不支持HA，且支持的docker版本、K8S版本也有限。
+
+
+
 kubespray和ansible的关系：
 
     kubespray本质是一堆ansible的role文件,通过ansible方式可以自动化的安装高可用k8s集群,目前支持1.9.

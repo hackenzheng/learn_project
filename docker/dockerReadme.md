@@ -69,3 +69,10 @@ docker 默认的存储路径在 /var/lib/docker下面,当镜像和容器比较�
 
     systemctl daemon-reload
     systemctl start docker
+
+
+
+## docker 镜像
+基础镜像有busybox和apline, busybox是有netstat等上百种linux工具，apline是一个面向安全的轻型linux发型版。
+
+<alpine介绍> https://yeasy.gitbooks.io/docker_practice/cases/os/alpine.html

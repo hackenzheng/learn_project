@@ -67,3 +67,8 @@ ssh -i "aws-unbuntu-1.pem" ubuntu@ec2xx-xx-xx.us-east-2.compute.amazonaws.com，
 
 youtube视频下载插件
 https://addoncrop.com/youtube_video_downloader/
+
+
+## 搬瓦工
+
+促销活动才有30美元1年， 流量比较大，vps的配置比较低， 机房在洛杉矶， 不一定有货， https://bandwagonhost.cn/promotion.html

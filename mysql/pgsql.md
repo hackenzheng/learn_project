@@ -105,7 +105,7 @@ MPP(Massively Parallel Processing)的重点首先是本地存储数据，其次�
 
 
 ## pgbench
-pgbench是基于tpc-b模型的postgresql测试工具
+pgbench是基于tpc-b模型的postgresql测试工具，安装好pgsql自带pgbench
 
 创建好数据库pgbench : create database pgbench-test
 
@@ -197,3 +197,13 @@ END;
     pgbench -h localhost -U postgres -c 10 -t 100 -d pgbench-test -f ./test.sql
     
     <官方手册 有自定义脚本的说明>https://www.postgresql.org/docs/9.6/pgbench.html
+    
+
+
+## sysbench
+SysBench是一个模块化的、跨平台、多线程基准测试工具,除了测性能之外还可以测试系统负载如cpu,磁盘io,内存分配和传输速度等。
+目前sysbench主要支持 MySQL,pgsql,oracle 这3种数据库。
+
+安装： sudo apt-get install sysbench
+
+<详解MySQL基准测试和sysbench工具>  https://www.cnblogs.com/kismetv/p/7615738.html

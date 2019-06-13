@@ -109,3 +109,12 @@ k8s资源和调度：
 
 <分布式(一) 搞定服务注册与发现 > https://crossoverjie.top/2018/08/27/distributed/distributed-discovery-zk/
 
+
+## kubectl
+
+kubectl访问集群通过config文件中的认证信息进行认证，主要包含clusters, users, contexts三个字段，并且每个字段都是列表模式，支持配置多个。
+往往会操作多个k8s集群，通过vi手动将不同集群的config信息放到同一个config文件，然后进行切换。
+
+kubectl config use-context 11-127   进行切换
+
+![](./kubectl_config.bmp)

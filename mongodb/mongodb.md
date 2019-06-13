@@ -62,5 +62,77 @@ mongodb聚合查询：
 
 
 
+## mongodb部署
 
+物理机部署
+    
+    官方下载地址 https://www.mongodb.com/download-center/community
+    下载Ubuntu版本deb包安装之后只会有服务端，没有客户端
+    
+    下载二进制版本， 版本号对应修改
+    curl -O https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-4.0.10.tgz
+    tar -zxvf mongodb-linux-x86_64-4.0.10.tgz
+    mv mongodb-linux-x86_64-4.0.10 /usr/local/mongodb
+    
+    mongod --dbpath=/data/db  # 启动服务并指定数据存储路径， 要后台启动就加&, 本身没有后台启动的选项
+    mongo   # 在服务器本机会直接登录
+    mongod --shutdown --dbpath /data/db   # 停止服务
+
+登录认证：
+
+    MongoDB 默认安装完成以后，只允许本地连接，同时不需要使用任何账号密码就可以直接连接MongoDB，这样就容易被黑
+    
+    创建管理员用户
+    use admin
+    db.createUser({user:"admin",pwd:"admin",roles:["root"]})  # 用户的权限是跟库绑定的
+    
+    ./mongod --auth  --bind_ip_all # 启用认证,允许远程登录
+    
+    ./mongo 进入到交互模式， 是启动客户端之后再认证而不想MySQL等要先输入密码认证再进入交互模式
+    use admin   # 一定要用admin数据库才能认证， 直接db.auth会报错
+    db.auth("admin", "password") 认证登录
+    
+
+## 常用命令
  
+    show dbs; 查看数据库
+    db.dropDatabase(); 删除当前数据库
+    use yourdb;  切换或创建数据库
+    show users;   查看用户
+    show roles;   查看角色
+    
+    use admin; db.system.users.find()  # 显示当前系统用户
+    
+    use newdb;  创建数据库
+    db.createCollection('newcollection')  创建新的表
+    show collections  显示所有的表
+    
+    db.test.find()  # 查询所有数据
+    db.test.find().count()  计数
+    
+    # 在3.0.0 版本前创建索引方法为ensureIndex()，之后的版本使用了createIndex()，ensureIndex()还能用，但只是createIndex() 的别名。
+    db.collection.createIndex(keys, options)  
+    db.collection.createIndex({open: 1, close: 1}, {background: true})　　# 在后台创建索引,索引的升序主要是跟排序或范围查询的时候有关
+    
+    
+## 性能测试 YCSB
+没有自带的benchmark测试工具，可以写脚本自行测试，另外有YCSB。 YCSB是雅虎开源的一款通用的NoSQL性能测试工具.
+
+使用：
+    
+    下载ycsb并解压
+    curl -O --location https://github.com/brianfrankcooper/YCSB/releases/download/0.5.0/ycsb-0.5.0.tar.gz
+    tar xfvz ycsb-0.5.0.tar.gz
+    cd ycsb-0.5.     # bin目录下有yscb执行文件，是个Python脚本； workloads目录下有各种workload的模板，可以基于workload模板进行个性化修改
+    
+    ycsb测试的时候分为load和transaction两阶段， load用于构造测试数据。 对于不同的db都有一些选项，比如mongo就有mongodb 和 mongodb-async，默认是同步模式。
+    测试mongo的时候在配置文件中配置mongo
+    
+    mongodb.url=mongodb://admin:admin192.168.137.10:34001/ycsb?  # mongodb对应的uri等
+    mongodb.database=ycsb # 对应的db
+    mongodb.writeConcern=normal # 写级别
+    
+    ./bin/ycsb load mongodb-async -s -P workloads/workloada > outputLoad.txt  # 使用异步模式加载数据, -P 指定workload文件，-s把状态输出到stderr中
+    ./bin/ycsb run mongodb-async -s -P workloads/workloada > outputRun.txt    # 使用异步模式执行测试
+    
+    如果要自定义表和字段，需要修改jar包源码，不能通过配置实现

@@ -52,3 +52,27 @@ Helm 管理依赖的方式：
 安装本地应用 `helm install --name service-name chart-path`
 
 更新本地应用 `helm upgrade flbackend --set flbackend.deployment.image=192.168.2.46:5000/aios/flbackend:0.2 charts/flbackend`
+
+
+## helm安装pg
+
+下载官方charts到本地git clone https://github.com/helm/charts 
+
+修改charts目录下pgsql中的values.yaml
+
+helm install -name pgsql --namespace test charts/stable/postgresql
+
+在线安装操作：
+    
+    helm repo list  # 默认有stable和incubator，对应github charts目录下的stable和incubator
+    helm repo add my-repo https://kubernetes-charts-incubator.storage.googleapis.com/  # 添加repo
+    helm search mysql   # 搜索repo里面有哪些MySQL的chart
+    helm inspect stable/mysql   # 查看具体的信息
+    helm install stable/mysql  # 部署mysql
+    
+    部署之前自定义选项
+    helm inspect values stable/mysql  # 查询支持的选项
+    helm install --name db-mysql --set mysqlRootPassword=anoyi  stable/mysql  # 自定义 password 持久化存储
+    
+    上传chart到chart仓库
+    helm repo add fantastic-charts http://bjo-ep-dep-039.dev.fwmrm.net:8879/charts

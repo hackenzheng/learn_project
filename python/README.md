@@ -154,3 +154,9 @@ evenlet实现过程:
 spawn是产卵的意思, 在gevent和evenlet中, spawn()干的事情就是生成一个Greenlet实例，然后将这个实例的self.switch方法注册到主循环(hub)回调中
 gevent.joinall就是用来启动事件轮询并等待运行结果的。  总结:gevent.spawn创建一个新的Greenlet，并注册到hub的loop上，调用gevent.joinall或者Greenlet.join的时候开始切换到hub。
 
+
+## python进程后台运行并重定向
+
+nohup python -u test.py >> services.log 2>&1 &
+
+-u选项非常重要, 由于python有缓冲机制，print不一定会立刻输出到文件！！！ 加了-u可以让stdout等强制无缓冲, 立刻输出到文件。 不加则要等程序运行结束才会有结果。

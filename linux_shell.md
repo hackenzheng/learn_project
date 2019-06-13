@@ -34,6 +34,18 @@ netstat:
     提示：LISTEN和LISTENING的状态只有用-a或者-l才能看到
   
 
+top:
+    
+    load average 后面是平均3分钟，5分钟的cpu消耗指标，一个cpu用满就是1,5个cpu用满就是5
+    
+    KiB Mem 显示的是内存使用情况，total是物理内存总量， free是未分配的内存总量， used是已经使用的(不等于已分配的)， buff/cache是已分配里面未被使用的
+    buff指的是写缓冲， chache指的是读缓存。 E(shift+e)可以切换内存的单位
+    
+    N – 以 PID 的大小的顺序排列表示进程列表
+    P – 以 CPU 占用率大小的顺序排列进程列表
+    M – 以内存占用率大小的顺序排列进程列表
+    
+
 挂载磁盘 
 
     （1）创建目录/data

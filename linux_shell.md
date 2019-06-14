@@ -110,6 +110,13 @@ vim插件配置： spacevim 或 spf-13 vim 或youcompleteme+ctag
 
 复制缩进问题： :set paste
 
+从vi复制到浏览器:
+
+    sudo apt-get install vim-gnome  
+    
+    vi ~/.vimrc 添加如下内容：
+    nmap <c-c> "+y
+    nmap <c-v> "+p
 
 ## git
 

@@ -1,5 +1,7 @@
-dockerFile:
-  flask启动指定端口80，需要expose暴露该端口，然后docker run -p映射到宿主机端口
+service nodeport:
+
+    service配置为nodeport暴露出来时需要配置port, targetPort, nodePort三个端口，含义分别是targetPort是服务本身的端口，比如flask服务
+    启动时指定为30500，port是这个pod(docker)的端口，如果只是用docker起需要expose出来的那个端口，nodePort就是通过物理机ip访问的那个端口。
 
 
 k8s网络：
@@ -118,3 +120,7 @@ kubectl访问集群通过config文件中的认证信息进行认证，主要包�
 kubectl config use-context 11-127   进行切换
 
 ![](./kubectl_config.bmp)
+
+
+## ingress
+先在k8s集群安装ingress组件，然后创建service，再建ingress服务，在ingress服务中将path和service对应起来。

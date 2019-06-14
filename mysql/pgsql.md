@@ -74,8 +74,12 @@ service postgresql restart/start/stop/reload/status
 
 ## 分区
 pgsql支持分区，通过分区在底层分文件存储可以存储更多的数据。不同于分表，分区对外仍然是一张表，会有解析上的性能瓶颈。
+PostgreSQL 10 是第一个支持内置声明式分区表的版本。支持 range、list 分区，与以前的版本相比，提供了显著的性能和易用性优势，但却忽略了许多功能特性和性能优化。
+PostgreSQL 11 为分区表功能提供更多的改进。这些特性包括：hash 分区、索引增强、DML改进，以及性能优化：faster partition pruning、run-time partition pruning,、partition-wise join。
 
-pgsql 10.0之前的版本创建分区需要使用inherit，新版本是不用，创建表时指定分区字段，并且能获取分区存储使用情况及动态增加分区。
+pgsql 10.0之前的版本创建分区需要使用inherit，10之后的版本改为创建表时指定分区字段，并且能获取分区存储使用情况及动态增加分区。
+
+分区方式有范围分区和列表分区两种， 范围分区就是指定一个区间，列表分区是将符合条件的都要列出来
 
 
 ## 查询时间测试
@@ -86,7 +90,33 @@ postgres 数据库查看sql的执行时间：
     explain select count(*) from table; 只要查询计划，不会真正的执行
     EXPLAIN ANALYZE select count(*) from table;  既有查询计划也会真正的执行耗时
     
+
+## 索引优化
+索引可以提高查询速度，但是不代表加了索引就一定会加快查询速度，有时甚至会适得其反。
+另外要看数据的分布，你先看哪个语句慢，条件是什么，这个条件下，数据的分布如何，如果这个条件下，数据超过10%的分布在某个值，那这个索引基本也提高不了性能，因为筛选出的数据集还是很大。
+另外对长字段加索引查询速度也可能变慢，可以使用前缀索引，即对字段的前多个少个字符索引。
+
+explain结果查看：
+
+    seq scan，顺序扫描又是全表扫描
     
+    index scan，索引扫描（需要回表）
+    
+    index only scan，索引扫描（通过VM减少回表，大多数情况下，不需要回表）
+    
+    bitmap scan，普通的index scan一次只读一条索引项，那么一个PAGE面有可能被多次访问；而 bitmap scan一次性将满足条件的索引项全部取
+    出，并在内存中进行排序, 然后根据取出的索引项访问表数据。当 PostgreSQL 需要合并索引访问的结果子集时 会用到这种方式 ，通常是在用到 "or"，
+    “and”时会出现"Bitmap heap scan"。即bitmap分为bitmap index scan和bitmap heap scan两个阶段,bitmap index scan 就是index scan。
+    先扫描索引获取到对应的page页，这个时候可能会有不同的索引项对应到通一个page,统计出最终需要扫描的page，然后将数据取出来进行排序等，减少io次数。
+    对于每个查询条件，在对应索引中找到符合条件的堆表PAGE，每个索引构造一个bitmap串。在这个bitmap串中，每一个BIT位对应一个HEAP PAGE，
+    代表这个HEAP PAGE中有符合该条件的行。
+
+
+<PostgreSQL 9种索引的原理和应用场景>  https://github.com/digoal/blog/blob/master/201706/20170627_01.md
+
+<postgresql中的各种scan的比较> https://www.cnblogs.com/flying-tiger/p/6702796.html
+
+<PostgreSQL bitmapAnd> https://yq.aliyun.com/articles/70462
 
 ## Greenplum
 Greenplum是基于postgresql的MPP架构的大数据处理开源数据库，能够线性扩展，支持pb级数据。 采用master/segment架构，
@@ -104,6 +134,22 @@ MPP(Massively Parallel Processing)的重点首先是本地存储数据，其次�
 <在 MySQL 和 PostgreSQL 之外，为什么阿里要研发 HybridDB 数据库？> https://www.infoq.cn/article/2016/12/MySQL-PostgreSQL-Greenplum
 
 
+## 性能测试时碰到的问题
+目的是造1亿条数据，索引字段是age和datestr，不小心datestr只限制在一个月内，导致每天的数据量特别大，建了索引之后查询反而更慢了。
+explain会发现走的是bitmap scan.
+
+即使建了索引，如果索引字段的某个值对应有很多数据，查询会很耗时。 比如当获取的数据分布很大(比如70%以上)时，
+用index scan 已经没有意义了，因为数据太多了，走索引再走表的代价已经超过了单纯走表的代价了。这里的分布考虑两点，
+一个是本身的数据量，如果是百万级即使只有3%也会慢；另外就是占比，如果超过50%比全量扫描的代价也差不多，因为走索引要回表。
+如果通过limit限制查询数量会加快。
+
+但如果用到了排序，即使用了limit,查询也会耗时, 所以测试应用用深分页查询。
+select * from day_result where datestr='20190605' offset 100000 limit 10;  # 立即出结果
+select * from day_result where datestr='20190605' order by age offset 100000 limit 10; #需要等几秒
+
+查询的时候mongodb比较耗内存，pgsql比较耗cpu.
+
+
 ## pgbench
 pgbench是基于tpc-b模型的postgresql测试工具，安装好pgsql自带pgbench
 
@@ -112,8 +158,13 @@ pgbench是基于tpc-b模型的postgresql测试工具，安装好pgsql自带pgben
 初始化数据库pgbench-test: pgbench -i pgbench-test -h localhost -U postgres , 需要输入密码，会创建
 pgbench_history, pgbench_tellers, pgbench_accounts, pgbench_branches四个表,但不会有数据。
 
-执行测试：pgbench -h localhost -U postgres -c 10 -t 100 -d pgbench-test.
--c clients 模拟的客户数，也就是并发数据库会话数目,默认是1。 -t transactions 每个客户端跑的事务数目，默认是 10。
+执行测试：pgbench -h localhost -U postgres -c 10 -t 100  pgbench-test.
+-c clients 模拟的客户数，也就是并发数据库会话数目,默认是1。 -t transactions 每个客户端跑的事务数目，默认是 10。 -d是打印日志，不能重定向，
+如果服务端没有响应会一直client 0 receiving
+
+
+执行自定义测试脚本：pgbench -h 192.168.11.127 -U postgres  -c 1 -t 1 -P 2 ailite -f ./pg.sql, -P 2是每隔2s输出信息。
+如果执行报错先pgbench -i ailite初始化一下，测试的时候仍然是执行自定义的语句，如果自定义的语句有错会执行不下去
 
 
 四个表的结构：
@@ -191,7 +242,7 @@ END;
     1.先创建好数据库和表
     2.编写sql, 变量只支持数值型
     \set age random(1, 95)
-    select * from day_result where age = :age;
+    select * from day_result where age = :age offset 10000 limit 10;
     select * from day_result where age > :age;
     3. 保存为test.sql
     pgbench -h localhost -U postgres -c 10 -t 100 -d pgbench-test -f ./test.sql

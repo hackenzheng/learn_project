@@ -29,10 +29,63 @@ helm template compose > generated-docker-compose.yml
 
 ## helm安装
 
-在能够执行kubectl的服务器上安装客户端
-`curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash`
+在能够执行kubectl的服务器上安装客户端,不然helm无效
+    
+    脚本安装：
+    curl -LO https://git.io/get_helm.sh
+    chmod 700 get_helm.sh
+    ./get_helm.sh
+    
+    或者直接执行 curl -L https://git.io/get_helm.sh | bash
+    
+    二进制安装
+    wget https://get.helm.sh/helm-v2.14.1-linux-amd64.tar.gz
+    tar -zxvf helm-v2.14.1-linux-amd64.tgz
+    mv linux-amd64/helm /usr/local/bin/helm
+    
+    
+    
+安装服务端tiller,会在k8s起一个tiller-deploy的应用,helm init会连接kubectl默认连接的kubernetes集群
+`help init` 
+安装tiller的过程，中间访问这个api若失败就多重试几次，访问不稳定。
+成功之后kubectl get pods -n kube-system | grep tiller会看到一个pod
+![](./helm_init.bmp)
 
-安装服务端tiller `help init --upgrade`
+```$xslt
+成功的显示
+Creating /home/zhg/.helm/repository/repositories.yaml 
+Adding stable repo with URL: https://kubernetes-charts.storage.googleapis.com 
+Adding local repo with URL: http://127.0.0.1:8879/charts 
+$HELM_HOME has been configured at /home/zhg/.helm.
+Warning: Tiller is already installed in the cluster.
+(Use --client-only to suppress this message, or --upgrade to upgrade Tiller to the current version.)
+Happy Helming!
+zhg@k8smaster:~/
+```
+
+helm init  在缺省配置下， Helm 会利用 "gcr.io/kubernetes-helm/tiller" 镜像在Kubernetes集群上安装配置 Tiller；
+并且利用 "https://kubernetes-charts.storage.googleapis.com" 作为缺省的 stable repository 的地址。由于在国内可能
+无法访问 "gcr.io", "storage.googleapis.com" 等域名，阿里云容器服务为此提供了镜像站点。
+
+    helm init --upgrade -i registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:v2.5.1 --stable-repo-url https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts 
+    
+    其他指定镜像的配置
+    helm init --service-account tiller --tiller-image 4admin2root/tiller:v2.6.0 --upgrade
+
+
+部署应用时指定serviceaccount，不然没有权限
+
+    kubectl create serviceaccount --namespace kube-system tiller
+    kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+    kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+
+
+安装本地应用 `helm install --name service-name chart-path`
+
+当发现应用启动失败或者要更新镜像时，修改values.yaml文件之后可以用upgrade更新, values.yaml文件中如果是label中的true或false需要用引号
+更新本地应用 `helm upgrade flbackend --set flbackend.deployment.image=192.168.2.46:5000/aios/flbackend:0.2 charts/flbackend`
+
+彻底删除应用  `helm delete --purge app`
 
 在本地构建chart 包：
 
@@ -49,9 +102,21 @@ Helm 管理依赖的方式：
     把依赖的 package 放在 charts/ 目录中， 比如web应用需要pgsql, 就会把pgsql的chart包放到本地的charts目录
     在requirements.yaml中配置
 
-安装本地应用 `helm install --name service-name chart-path`
+补充：其实部署有多种方式：
 
-更新本地应用 `helm upgrade flbackend --set flbackend.deployment.image=192.168.2.46:5000/aios/flbackend:0.2 charts/flbackend`
+    指定chart: helm install stable/mariadb
+    指定打包的chart: helm install ./nginx-1.2.3.tgz
+    指定打包目录: helm install ./nginx
+    指定chart包URL: helm install https://example.com/charts/nginx-1.2.3.tgz
+    
+    如果要覆盖chart中的默认值，通过指定配置文件方式helm install -f myvalues.yaml ./redis
+    或通过--set key=value方式  helm install --set name=prod ./redis
+    例：helm install -n mysql -f mysql/values.yaml --set resources.requests.memory=512Mi mysql
+
+
+存在的问题：
+    
+    helm charts当中values.yaml往往需要修改，比如镜像拉不下来
 
 
 ## helm安装pg
@@ -66,6 +131,7 @@ helm install -name pgsql --namespace test charts/stable/postgresql
     
     helm repo list  # 默认有stable和incubator，对应github charts目录下的stable和incubator
     helm repo add my-repo https://kubernetes-charts-incubator.storage.googleapis.com/  # 添加repo
+    helm repo add fabric8 https://fabric8.io/helm  # 添加fabric8库
     helm search mysql   # 搜索repo里面有哪些MySQL的chart
     helm inspect stable/mysql   # 查看具体的信息
     helm install stable/mysql  # 部署mysql
@@ -76,3 +142,7 @@ helm install -name pgsql --namespace test charts/stable/postgresql
     
     上传chart到chart仓库
     helm repo add fantastic-charts http://bjo-ep-dep-039.dev.fwmrm.net:8879/charts
+    
+    
+使用rancher的应用商店也能非常快速方便的部署这些应用。helm和rancher省去了很多配置，需要先自行创建pv和storage class,如果碰到镜像失败也得改yaml文件。
+可以依据helm的配置自行进行拆解写yaml文件，拆解之后更方便定制，以及对中间的某个组件更容易维护。

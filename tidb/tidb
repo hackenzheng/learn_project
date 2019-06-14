@@ -15,4 +15,6 @@ https://pingcap.com/docs/dev/how-to/get-started/local-cluster/install-from-binar
 
 默认会装3个pd, 3个TiKV, 1个TiDB, 监控组件有Prometheus, Pushgateway, Grafana，以及数据可视化tidb-vision
 
+连接： mysql -h 127.0.0.1 -P 4000 -u root
+
 https://pingcap.com/docs/dev/how-to/get-started/local-cluster/install-from-docker-compose/

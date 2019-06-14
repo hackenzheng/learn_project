@@ -3,6 +3,8 @@
 stateful set解决的问题：单一容器就能启动不需要，即使需要数据持久化，需要数据持久化不代表就是有状态的应用。
 那mongodb为例，如果是单例模式就直接启动，如果是副本集等模式就需要stateful set。
 
+statefulset部署的应用起来后没哟deployment,没有replicaset, 只有statefulset,pod,service以及需要的pv,pvc等。
+
 mongodb部署在k8s
 
     若一个容器挂了，并且被重新编排，数据丢失是不能接受的，通过volume来持久化。
@@ -11,9 +13,13 @@ mongodb部署在k8s
     例如，所有pod内的容器共享一个IP地址，当pod被重编排之后这个地址就会改变。在Kubernetes中，这个问题可以通过联系Kubernetes服务与MongoDB节点来解决，采用Kubernetes的DNS服务提供主机名给重编排之后的服务。
     
     一旦每个独立的MongoDB节点（每个节点在单独容器中）启动起来，备份集合必须初始化，并把每个节点加入进来。这可能需要编排工具之外的代码。具体而言，必须使用目标副本集群中的主MongoDB节点执行rs.initiate和rs.add命令。
+    
+    用helm部署mongodb-replica的时候，会启动三个pod,一个节点对应一个pod,类似于物理机启动需要一个个启动然后rs.add, 
+    pod也是一个个按顺序启动，而非像deployment一样同时起多个pod.
 
 
-需要通过stateful set部署的
+
+需要通过stateful set部署的应用
 
     kubectl get statefulset -n cloudai-2
     NAME                   DESIRED   CURRENT   AGE
@@ -142,4 +148,5 @@ mongodb部署在k8s
     zookeeper-0                                 1/1       Running   2          7d
     zookeeper-1                                 1/1       Running   1          7d
     zookeeper-2                                 1/1       Running   1          7d
+    
     

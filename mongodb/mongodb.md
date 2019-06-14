@@ -91,7 +91,52 @@ mongodb聚合查询：
     ./mongo 进入到交互模式， 是启动客户端之后再认证而不想MySQL等要先输入密码认证再进入交互模式
     use admin   # 一定要用admin数据库才能认证， 直接db.auth会报错
     db.auth("admin", "password") 认证登录
+
+k8s部署：
+
+    helm install --name mongo  charts/stable/mongodb-replicaset/
+    NAME:   mongo
+    LAST DEPLOYED: Thu Jun 13 16:58:04 2019
+    NAMESPACE: default
+    STATUS: DEPLOYED
     
+    RESOURCES:
+    ==> v1/ConfigMap
+    NAME                              AGE
+    mongo-mongodb-replicaset-init     1s
+    mongo-mongodb-replicaset-mongodb  1s
+    mongo-mongodb-replicaset-tests    1s
+    
+    ==> v1/Service
+    mongo-mongodb-replicaset-client  1s
+    mongo-mongodb-replicaset         1s
+    
+    ==> v1/StatefulSet
+    mongo-mongodb-replicaset  1s
+    
+    ==> v1/Pod(related)
+    
+    NAME                        READY  STATUS   RESTARTS  AGE
+    mongo-mongodb-replicaset-0  0/1    Pending  0         1s
+    
+    
+    NOTES:
+    1. After the statefulset is created completely, one can check which instance is primary by running:
+    
+        $ for ((i = 0; i < 3; ++i)); do kubectl exec --namespace default mongo-mongodb-replicaset-$i -- sh -c 'mongo --eval="printjson(rs.isMaster())"'; done
+    
+    2. One can insert a key into the primary instance of the mongodb replica set by running the following:
+        MASTER_POD_NAME must be replaced with the name of the master found from the previous step.
+    
+        $ kubectl exec --namespace default MASTER_POD_NAME -- mongo --eval="printjson(db.test.insert({key1: 'value1'}))"
+    
+    3. One can fetch the keys stored in the primary or any of the slave nodes in the following manner.
+        POD_NAME must be replaced by the name of the pod being queried.
+    
+        $ kubectl exec --namespace default POD_NAME -- mongo --eval="rs.slaveOk(); db.test.find().forEach(printjson)"
+    
+    
+    默认的配置需要一个pvc, 如果要给pvc增加selector,就需要修改value.yaml文件
 
 ## 常用命令
  
@@ -128,7 +173,7 @@ mongodb聚合查询：
     ycsb测试的时候分为load和transaction两阶段， load用于构造测试数据。 对于不同的db都有一些选项，比如mongo就有mongodb 和 mongodb-async，默认是同步模式。
     测试mongo的时候在配置文件中配置mongo
     
-    mongodb.url=mongodb://admin:admin192.168.137.10:34001/ycsb?  # mongodb对应的uri等
+    mongodb.url=mongodb://192.168.137.10:34001/ycsb?  # mongodb对应的uri等，测试的时候最好不开启认证，就不需要用户密码
     mongodb.database=ycsb # 对应的db
     mongodb.writeConcern=normal # 写级别
     

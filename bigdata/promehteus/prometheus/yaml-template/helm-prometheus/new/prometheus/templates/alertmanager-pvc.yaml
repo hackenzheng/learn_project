@@ -1,0 +1,19 @@
+# Source: prometheus/templates/alertmanager-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-7.3.0
+    component: "alertmanager"
+    heritage: Tiller
+    release: donating-hamster
+  name: donating-hamster-prometheus-alertmanager
+spec:
+  accessModes:
+    - ReadWriteOnce
+    
+  resources:
+    requests:
+      storage: "2Gi"
+---

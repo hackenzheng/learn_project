@@ -1,0 +1,65 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: elasticsearch-logging-v1
+  namespace: kube-logging
+  labels:
+    k8s-app: elasticsearch-logging
+    version: "v2.4.1"
+    kubernetes.io/cluster-service: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: elasticsearch-logging
+      version: "v2.4.1"
+  template:
+    metadata:
+      labels:
+        k8s-app: elasticsearch-logging
+        version: "v2.4.1"
+        kubernetes.io/cluster-service: "true"
+    spec:
+      containers:
+      - image: "registry.cn-shenzhen.aliyuncs.com/zbcloud/efk:elasticsearch-v2.4.1"
+        name: elasticsearch-logging
+        resources:
+          # need more cpu upon initialization, therefore burstable class
+          limits:
+            cpu: 1000m
+          requests:
+            cpu: 100m
+        ports:
+        - containerPort: 9200
+          name: db
+          protocol: TCP
+        - containerPort: 9300
+          name: transport
+          protocol: TCP
+        volumeMounts:
+        - name: es-persistent-storage
+          mountPath: /data
+      volumes:
+      - name: es-persistent-storage
+        hostPath:
+          path: /mnt/storage/efk
+      serviceAccountName: efk 
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-logging
+  namespace: "kube-logging"
+  labels:
+    k8s-app: elasticsearch-logging
+    kubernetes.io/cluster-service: "true"
+    kubernetes.io/name: "Elasticsearch"
+spec:
+  ports:
+  - port: 9200
+    protocol: TCP
+    targetPort: db
+  selector:
+    k8s-app: elasticsearch-logging

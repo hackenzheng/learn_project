@@ -1,0 +1,31 @@
+# Source: prometheus/templates/kube-state-metrics-deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-7.3.0
+    component: "kube-state-metrics"
+    heritage: Tiller
+    release: donating-hamster
+  name: donating-hamster-prometheus-kube-state-metrics
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        component: "kube-state-metrics"
+        release: donating-hamster
+    spec:
+      serviceAccountName: donating-hamster-prometheus-kube-state-metrics
+      containers:
+        - name: prometheus-kube-state-metrics
+          image: "quay.io/coreos/kube-state-metrics:v1.4.0"
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - name: metrics
+              containerPort: 8080
+          resources:
+            {}
+---

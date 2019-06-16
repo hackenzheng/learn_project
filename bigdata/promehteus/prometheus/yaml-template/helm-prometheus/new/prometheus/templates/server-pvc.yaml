@@ -1,0 +1,19 @@
+# Source: prometheus/templates/server-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-7.3.0
+    component: "server"
+    heritage: Tiller
+    release: donating-hamster
+  name: donating-hamster-prometheus-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+    
+  resources:
+    requests:
+      storage: "8Gi"
+---

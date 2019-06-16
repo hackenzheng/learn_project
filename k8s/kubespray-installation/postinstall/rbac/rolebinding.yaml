@@ -1,0 +1,13 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: training
+  namespace: mxnet
+subjects:
+  - kind: User
+    name: dev
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: mxnet-role
+  apiGroup: rbac.authorization.k8s.io

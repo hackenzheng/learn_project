@@ -1,0 +1,39 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: zookeeper-pv-0
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /mnt/storage/zoo-0
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: zookeeper-pv-1
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /mnt/storage/zoo-1
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: zookeeper-pv-2
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /mnt/storage/zoo-2

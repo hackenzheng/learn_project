@@ -1,0 +1,20 @@
+# Source: prometheus/templates/kube-state-metrics-clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-7.3.0
+    component: "kube-state-metrics"
+    heritage: Tiller
+    release: donating-hamster
+  name: donating-hamster-prometheus-kube-state-metrics
+subjects:
+  - kind: ServiceAccount
+    name: donating-hamster-prometheus-kube-state-metrics
+    namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: donating-hamster-prometheus-kube-state-metrics
+---

@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ceph-example
+  namespace: default
+spec:
+  template:
+    metadata: 
+      name: ceph-example
+      labels:
+        app: ceph-example
+    spec:
+      containers:
+      - name: ceph-example
+        image: mxnet:1.2.1
+        imagePullPolicy: IfNotPresent
+        command:
+          - sleep
+          - "3000"
+        volumeMounts:
+          - name: cephtest
+            mountPath: /mnt/cephfs
+      volumes:
+        - name: cephtest
+          persistentVolumeClaim:
+            claimName: cephfs-pv-claim
+      restartPolicy: Never

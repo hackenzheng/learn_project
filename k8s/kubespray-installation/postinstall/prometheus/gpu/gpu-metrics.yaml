@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: gpu-metrics
+  labels:
+    app: gpu-metrics
+spec:
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: gpu-metrics
+    spec:
+      containers:
+      - name: gpu-metrics
+        image: gpu-exporter:0.1
+        imagePullPolicy: IfNotPresent
+        command: ["python", "nvidia-prometheus-stats.py", "--verbose", "-g", "http://prom-prometheus-pushgateway:9091", "-u", "10"]

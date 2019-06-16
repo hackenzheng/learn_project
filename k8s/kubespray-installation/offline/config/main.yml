@@ -1,0 +1,66 @@
+---
+- name: gather os specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution|lower }}-{{ ansible_distribution_version|lower|replace('/', '_') }}.yml"
+        - "{{ ansible_distribution|lower }}-{{ ansible_distribution_release }}.yml"
+        - "{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version|lower|replace('/', '_') }}.yml"
+        - "{{ ansible_distribution|lower }}.yml"
+        - "{{ ansible_os_family|lower }}.yml"
+        - defaults.yml
+      paths:
+        - ../vars
+      skip: true
+  tags:
+    - facts
+
+# https://yum.dockerproject.org/repo/main/opensuse/ contains packages for an EOL
+# openSUSE version so we can't use it. The only alternative is to use the docker
+# packages from the distribution repositories.
+- name: Warn about Docker version on SUSE
+  debug:
+    msg: "SUSE distributions always install Docker from the distro repos"
+  when: ansible_pkg_mgr == 'zypper'
+
+- include_tasks: set_facts_dns.yml
+  when: dns_mode != 'none' and resolvconf_mode == 'docker_dns'
+  tags:
+    - facts
+
+- name: check for minimum kernel version
+  fail:
+    msg: >
+          docker requires a minimum kernel version of
+          {{ docker_kernel_min_version }} on
+          {{ ansible_distribution }}-{{ ansible_distribution_version }}
+  when: (not ansible_os_family in ["CoreOS", "Container Linux by CoreOS"]) and (ansible_kernel|version_compare(docker_kernel_min_version, "<"))
+  tags:
+    - facts
+
+- name: flush handlers so we can wait for docker to come up
+  meta: flush_handlers
+
+- name: set fact for docker_version
+  command: "docker version -f '{{ '{{' }}.Client.Version{{ '}}' }}'"
+  register: installed_docker_version
+  changed_when: false
+
+- name: check minimum docker version for docker_dns mode. You need at least docker version >= 1.12 for resolvconf_mode=docker_dns
+  fail:
+    msg: "You need at least docker version >= 1.12 for resolvconf_mode=docker_dns"
+  when: >
+        dns_mode != 'none' and
+        resolvconf_mode == 'docker_dns' and
+        installed_docker_version.stdout|version_compare('1.12', '<')
+
+- name: Set docker systemd config
+  import_tasks: systemd.yml
+
+- name: ensure docker service is started and enabled
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items:
+    - docker

@@ -1,0 +1,14 @@
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: mxnet-clusterrolebinding
+  namespace: "mxnet"
+subjects:
+  - kind: User
+    name: dev
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: mxnet-clusterrole
+  apiGroup: rbac.authorization.k8s.io

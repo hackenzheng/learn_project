@@ -1,0 +1,32 @@
+{
+  "type": "datasource",
+  "name": "hbase",
+  "id": "intellif-hbase-datasource",
+
+  "info": {
+    "description": "hbase link",
+    "author": {
+      "name": "luanpeng",
+      "url": "optional url"
+    },
+    "keywords": ["searchable", "key", "words"],
+    "logos": {
+      "small": "img/logo_small.png",
+      "large": "img/logo_large.png"
+    },
+    "links": [
+      {"name": "Project site", "url": "https://github.com/yourorg/your-datasource"},
+      {"name": "Apache License", "url": "https://github.com/yourorg/your-datasource/blob/master/LICENSE"}
+    ],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "4.5.x",
+    "plugins": [ ]
+  },
+
+  "metrics": true,
+  "annotations": false
+}

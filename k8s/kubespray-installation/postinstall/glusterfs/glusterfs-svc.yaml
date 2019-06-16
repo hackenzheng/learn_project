@@ -1,0 +1,22 @@
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: glusterfs-cluster
+subsets:
+- addresses:
+  - ip: 192.168.99.33
+  ports:
+  - port: 1990
+- addresses:
+  - ip: 192.168.99.35
+  ports:
+  - port: 1990
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: glusterfs-cluster
+spec:
+  ports:
+  - port: 1990

@@ -1,0 +1,54 @@
+# Source: prometheus/templates/node-exporter-daemonset.yaml
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-7.3.0
+    component: "node-exporter"
+    heritage: Tiller
+    release: donating-hamster
+  name: donating-hamster-prometheus-node-exporter
+spec:
+  updateStrategy:
+    type: OnDelete
+    
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        component: "node-exporter"
+        release: donating-hamster
+    spec:
+      serviceAccountName: donating-hamster-prometheus-node-exporter
+      containers:
+        - name: prometheus-node-exporter
+          image: "prom/node-exporter:v0.16.0"
+          imagePullPolicy: "IfNotPresent"
+          args:
+            - --path.procfs=/host/proc
+            - --path.sysfs=/host/sys
+          ports:
+            - name: metrics
+              containerPort: 9100
+              hostPort: 9100
+          resources:
+            {}
+            
+          volumeMounts:
+            - name: proc
+              mountPath: /host/proc
+              readOnly:  true
+            - name: sys
+              mountPath: /host/sys
+              readOnly: true
+      hostNetwork: true
+      hostPID: true
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: sys
+          hostPath:
+            path: /sys
+---

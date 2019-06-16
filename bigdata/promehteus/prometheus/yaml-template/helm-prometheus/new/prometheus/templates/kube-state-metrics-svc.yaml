@@ -1,0 +1,27 @@
+# Source: prometheus/templates/kube-state-metrics-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+    
+  labels:
+    app: prometheus
+    chart: prometheus-7.3.0
+    component: "kube-state-metrics"
+    heritage: Tiller
+    release: donating-hamster
+  name: donating-hamster-prometheus-kube-state-metrics
+spec:
+  clusterIP: None
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: prometheus
+    component: "kube-state-metrics"
+    release: donating-hamster
+  type: "ClusterIP"
+---

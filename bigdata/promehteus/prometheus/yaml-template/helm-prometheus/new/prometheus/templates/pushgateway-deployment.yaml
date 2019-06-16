@@ -1,0 +1,37 @@
+# Source: prometheus/templates/pushgateway-deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-7.3.0
+    component: "pushgateway"
+    heritage: Tiller
+    release: donating-hamster
+  name: donating-hamster-prometheus-pushgateway
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        component: "pushgateway"
+        release: donating-hamster
+    spec:
+      serviceAccountName: donating-hamster-prometheus-pushgateway
+      containers:
+        - name: prometheus-pushgateway
+          image: "prom/pushgateway:v0.5.2"
+          imagePullPolicy: "IfNotPresent"
+          args:
+          ports:
+            - containerPort: 9091
+          readinessProbe:
+            httpGet:
+              path: /#/status
+              port: 9091
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+          resources:
+            {}
+---

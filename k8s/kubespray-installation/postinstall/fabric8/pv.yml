@@ -1,0 +1,120 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: fabric8
+  annotations:
+    volume.beta.kubernetes.io/storage-class: standard
+  labels:
+    provider: fabric8
+    project: fabric8-docker-registry
+    version: 2.2.311
+    group: io.fabric8.devops.apps
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /mnt/storage/fabric8
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: gogs
+  annotations:
+    volume.beta.kubernetes.io/storage-class: standard
+  labels:
+    provider: fabric8
+    project: gogs
+    version: 2.2.311
+    group: io.fabric8.devops.apps
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /mnt/storage/gogs
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: jenkins-job
+  annotations:
+    volume.beta.kubernetes.io/storage-class: standard
+  labels:
+    provider: fabric8
+    project: jenkins
+    version: 2.2.311
+    group: io.fabric8.devops.apps
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /mnt/storage/jenkins-job
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: jenkins-repo
+  annotations:
+    volume.beta.kubernetes.io/storage-class: standard
+  labels:
+    provider: fabric8
+    project: jenkins
+    version: 2.2.311
+    group: io.fabric8.devops.apps
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /mnt/storage/jenkins-repo
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: jenkins-workspace
+  annotations:
+    volume.beta.kubernetes.io/storage-class: standard
+  labels:
+    provider: fabric8
+    project: jenkins
+    version: 2.2.311
+    group: io.fabric8.devops.apps
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /mnt/storage/jenkins-workspace
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nexus-storage
+  annotations:
+    volume.beta.kubernetes.io/storage-class: standard
+  labels:
+    provider: fabric8
+    project: nexus
+    version: 2.2.311
+    group: io.fabric8.devops.app
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /mnt/storage/nexus
+

@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ceph-example
+  namespace: default
+spec:
+  template:
+    metadata: 
+      name: ceph-example
+      labels:
+        app: ceph-example
+    spec:
+      containers:
+      - name: ceph-example
+        image: mxnet:1.2.1
+        imagePullPolicy: IfNotPresent
+        command:
+          - sleep
+          - "3000"
+        volumeMounts:
+          - name: cephtest
+            mountPath: /mnt/cephfs
+      volumes:
+        - name: cephtest
+          cephfs:
+            monitors:
+             - 192.168.2.156:6789
+             - 192.168.2.46:6789
+             - 192.168.2.177:6789
+            user: admin
+            path: /
+            secretRef:
+              name: cephfs-secret
+            readOnly: false
+      restartPolicy: OnFailure

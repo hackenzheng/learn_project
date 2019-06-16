@@ -1,0 +1,23 @@
+# Source: prometheus/templates/alertmanager-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-7.3.0
+    component: "alertmanager"
+    heritage: Tiller
+    release: donating-hamster
+  name: donating-hamster-prometheus-alertmanager
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 9093
+  selector:
+    app: prometheus
+    component: "alertmanager"
+    release: donating-hamster
+  type: "ClusterIP"
+---

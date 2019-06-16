@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  namespace: kube-system
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts:
+    - zhangbin.harbor
+    secretName: ingress-secret
+  rules:
+  - host: zhangbin.harbor
+    http:
+      paths: 
+      - path: /test
+        backend:
+          serviceName: nginx
+          servicePort: 80

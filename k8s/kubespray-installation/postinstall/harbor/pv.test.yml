@@ -1,0 +1,13 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: notary-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /mnt/storage/notary

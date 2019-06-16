@@ -1,14 +1,19 @@
-http请求头中Authorization字段是用于认证的, 若是基本认证, 该字段的值是把用户密码进行base64加密,安全性很低,生产环境很少使用. 一般是通过post传送用户密码.  OAuth（开放授权）是一个开放的授权标准，允许用户让第三方应用访问该用户在某一web服务上存储的私密的资源，而无需将用户名和密码提供给第三方应用。过程是先请求认证,认证后获得token,再用token去访问资源.
+http请求头中Authorization字段是用于认证的, 若是基本认证, 该字段的值是把用户密码进行base64加密,安全性很低,生产环境很少使用. 
+一般是通过post传送用户密码.  OAuth（开放授权）是一个开放的授权标准，允许用户让第三方应用访问该用户在某一web服务上存储的私密的资源，
+而无需将用户名和密码提供给第三方应用。过程是先请求认证,认证后获得token,再用token去访问资源.
  
 
  
-api认证:  使用restful api开发适用前后端分离,后端的服务全都通过api提供. 但api的访问权限需要做控制,不然知道这个api就都能访问.restful api本身是没有状态的, 也不会记录登录状态. 可以通过cookie和session记录. 
+restful api本身是没有状态的, 也不会记录登录状态. 可以通过cookie和session记录. 
  
 访问需要认证的api验证方式: 
  
 (1)用户名密码: 每次访问都需要用户名密码, 比较繁琐,且效率低. 不通过表单传送, 因为api本身的认证,不是登录界面. 那么用户密码通过HTTP BASIC Authentication, 用户密码通过base64编码后放在authentiate字段.
-(2)token的方式: 第一次客户端与服务器交换过认证信息后得到一个认证token，后面的请求就使用这个token进行请求.Token通常会给一个过期的时间，当超过这个时间后，就会变成无效，需要产生一个新的token。这样就算token泄漏了，危害也只是在有效的时间内。
-(3)cookie和session,用于浏览器, 因为浏览器请求才会自动带上cookie,其他比如python脚本, curl命令都需要手动设置才能有cookie. 其中session又分为客户端和服务端, 客户端指所有的session内容都编码作为cookie,  服务端则是只把session id放到cookie传递. 
+(2)token的方式: 第一次客户端与服务器交换过认证信息后得到一个认证token，后面的请求就使用这个token进行请求.Token通常会给一个过期的时间，
+当超过这个时间后，就会变成无效，需要产生一个新的token。这样就算token泄漏了，危害也只是在有效的时间内。Token机制在服务端不需要存储任何信息，因为Token自身包含了所有用户的信息及过期时间，
+客户端只会拿着token给到不同的服务端，每个服务事先约定好加密秘钥，用同一个秘钥加解密。
+(3)cookie和session,用于浏览器, 因为浏览器请求才会自动带上cookie,其他比如python脚本, curl命令都需要手动设置才能有cookie. 
+其中session又分为客户端和服务端, 客户端指所有的session内容都编码作为cookie,  服务端则是只把session id放到cookie传递. 
  
 第一种和第二种在flask使用Flask-HTTPAuth,第三种方式使用flask_login
 

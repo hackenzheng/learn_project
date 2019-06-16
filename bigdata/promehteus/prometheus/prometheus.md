@@ -8,7 +8,9 @@
 常用的组件大部分都有exporter可以直接使用，比如Nginx、MySQL
 
 prometheus可能会丢数据，导致监控的曲线中断，但不影响其广泛使用。
-   
+
+<prometheus book> https://yunlzheng.gitbook.io/prometheus-book/
+
 ## 部署
 二进制部署
     
@@ -26,49 +28,15 @@ prometheus可能会丢数据，导致监控的曲线中断，但不影响其广�
     自定义部署
     cd ./yaml-template
     kubectl create ns monitoring 
-    kubectl create -f ./operator/operator-sa.yml 
-    kubectl create -f ./operator/operator-rbac.yml 
-    kubectl create -f ./operator/operator-svc.yml 
-    kubectl create -f ./operator/operator-dp.yml 
-    kubectl create -f ./alertmanater/alertmanager-main-sa.yml # 创建alert的配置文件，定义报警方式 
-    kubectl create -f ./alertmanater/alertmanager-main-secret.yml 
-    kubectl create -f ./alertmanater/alertmanager-main-svc.yml 
-    kubectl create -f ./alertmanater/alertmanager-main.yml 
+    kubectl create -f ./operator
+    kubectl create -f ./alertmanater # 创建alert的配置文件，定义报警方式  
     kubectl create -f ./node-exporter/node-exporter-sa.yml 
-    kubectl create -f ./node-exporter/node-exporter-rbac.yml 
-    kubectl create -f ./node-exporter/node-exporter-svc.yml 
-    kubectl create -f ./node-exporter/node-exporter-ds.yml 
-    kubectl create -f ./kube-state-metrics/kube-state-metrics-sa.yml 
-    kubectl create -f ./kube-state-metrics/kube-state-metrics-rbac.yml 
-    kubectl create -f ./kube-state-metrics/kube-state-metrics-svc.yml 
-    kubectl create -f ./kube-state-metrics/kube-state-metrics-dp.yml 
-    kubectl create -f ./grafana/grafana-sa.yml 
-    kubectl create -f ./grafana/grafana-source.yml # 自定义配置文件，定义显示方式 
-    kubectl create -f ./grafana/grafana-datasources.yml 
-    kubectl create -f ./grafana/grafana-admin-secret.yml 
-    kubectl create -f ./grafana/grafana-svc.yml 
-    kubectl create -f ./grafana/grafana-dp.yml 
-    kubectl create -f ./service-discovery/kube-controller-manager-svc.yml 
-    kubectl create -f ./service-discovery/kube-scheduler-svc.yml 
-    kubectl create -f ./prometheus/prometheus-rules.yml # 自定义配置文件，定义收集和报警规则 
-    kubectl create -f ./prometheus/prometheus-sa.yml 
-    kubectl create -f ./prometheus/prometheus-rbac.yml 
-    kubectl create -f ./prometheus/prometheus-svc.yml 
-    kubectl create -f ./prometheus/prometheus-main.yml 
-    kubectl create -f ./pushgateway/pushgateway-serviceaccount.yaml 
-    kubectl create -f ./pushgateway/pushgateway-service.yaml 
-    kubectl create -f ./pushgateway/pushgateway-deployment.yaml 
-    kubectl create -f ./servicemonitor/alertmanager-sm.yml # 创建监控目标 
-    kubectl create -f ./servicemonitor/coredns-sm.yml # 创建监控目标 
-    kubectl create -f ./servicemonitor/kube-apiserver-sm.yml # 创建监控目标 
-    kubectl create -f ./servicemonitor/kube-controller-manager-sm.yml # 创建监控目标 
-    kubectl create -f ./servicemonitor/kube-scheduler-sm.yml # 创建监控目标 
-    kubectl create -f ./servicemonitor/kubelet-sm.yml # 创建监控目标 
-    kubectl create -f ./servicemonitor/kubestate-metrics-sm.yml # 创建监控目标 
-    kubectl create -f ./servicemonitor/node-exporter-sm.yml # 创建监控目标 
-    kubectl create -f ./servicemonitor/prometheus-operator-sm.yml # 创建监控目标 
-    kubectl create -f ./servicemonitor/prometheus-sm.yml # 创建监控目标 
-    kubectl create -f ./servicemonitor/pushgateway-sm.yml # 创建监控目标
+    kubectl create -f ./kube-state-metrics/kube-state-metrics-sa.yml  
+    kubectl create -f ./grafana # 自定义配置文件，定义显示方式 
+    kubectl create -f ./service-discovery 
+    kubectl create -f ./prometheus/ # 自定义配置文件，定义收集和报警规则 
+    kubectl create -f ./pushgateway 
+    kubectl create -f ./servicemonitor
 
     <手动部署在k8s>  https://blog.csdn.net/luanpeng825485697/article/details/83755430
 
@@ -145,6 +113,23 @@ Prometheus Web界面自带的图表是非常基础的，比较适合用来做测
     访问Prometheus Web，在Status->Targets页面下，我们可以看到我们配置的两个Target
     输入node_memory_Active_bytes点击执行，就可以看到内存监控曲线
 
+## 其他监控应用
+对于一些开源组件入MySQL，redis等，有开源的exporter，先安装对应的exporter，启动时指定服务地址，修改prometheus.yml配置文件，
+重启prometheus即可。
+
+<监控redis> https://yq.aliyun.com/articles/251478
+
+监控自己开发的应用服务，首先需要服务提供api通metric查询或者直接将metric推到push-gateway. 在cloud-ai项目中，
+是在monitoring namespace中创建一个cloud-push-gateway,配置prometheus从这里拉取数据
+
+prometheus也可以监控到进程级别，需要安装process-exporter, 这样在做压力测试的时候只要管应用层，服务进程性能指标监控只要做简单配置。
+
+<prometheus 监控之 进程监控> https://blog.csdn.net/qq_25934401/article/details/86512657
+
+<promethesu 监控k8s/pod> https://www.kancloud.cn/huyipow/kubernetes/531996
+
+## 告警配置alert
+待补充
 
 ## 组件介绍
 
@@ -171,7 +156,10 @@ push gateway
     数据推到push gateway可以通过sdk推送，也可以通过访问API
     echo "some_metric 3.14" | curl --data-binary @- http://pushgateway.example.org:9091/metrics/job/some_job
 
-    
+push-gateway的web界面
+![](./push-gateway.bmp)
+
+  
 Alertmanager
 
     告警用的组件，监控的同时告警才有效果，感知不到系统的变化。

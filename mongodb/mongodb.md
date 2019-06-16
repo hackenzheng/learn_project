@@ -136,8 +136,26 @@ k8s部署：
         $ kubectl exec --namespace default POD_NAME -- mongo --eval="rs.slaveOk(); db.test.find().forEach(printjson)"
     
     
-    默认的配置需要一个pvc, 如果要给pvc增加selector,就需要修改value.yaml文件
+    默认的配置需要一个pvc, 如果要给pvc增加selector,就需要修改value.yaml文件.要外部访问需要再手动建一个service即可。
 
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: mongo-nodeport
+      namespace: default
+    spec:
+      selector:
+        "app": "mongodb-replicaset"
+        "release": "mongo"
+      ports:
+      - port: 27017
+        targetPort: 27017
+        nodePort: 27017
+      type: NodePort
+
+    
+    
+    
 ## 常用命令
  
     show dbs; 查看数据库

@@ -1,8 +1,14 @@
 service nodeport:
-
-    service配置为nodeport暴露出来时需要配置port, targetPort, nodePort三个端口，含义分别是targetPort是服务本身的端口，比如flask服务
-    启动时指定为30500，port是这个pod(docker)的端口，如果只是用docker起需要expose出来的那个端口，nodePort就是通过物理机ip访问的那个端口。
-
+    
+    nodeport是在clusterIP的基础上加增加了nodePort用于集群外部的访问。
+    所以配置为nodeport暴露出来时需要配置port, targetPort, nodePort三个端口，含义分别是targetPort是服务本身的端口，比如flask服务
+    启动时指定为30500，port是这个pod(docker)的端口，如果只是用docker起需要expose出来的那个端口，也即服务彼此间调用的那个端口，
+    nodePort就是通过物理机ip访问的那个端口。
+    
+    port和nodePort都是service的端口，前者暴露给k8s集群内部服务访问，后者暴露给k8s集群外部流量访问。从上两个端口过来的数据都需要经过反向代理kube-proxy，
+    流入后端pod的targetPort上，最后到达pod内的容器。
+    
+    另外targetport可以是字符串name,要是该pod端口的对应的name
 
 k8s网络：
     

@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/zhg/CLionProjects/libevent_sample/server_libevent.c
+netinet/in.h
+-
+sys/socket.h
+-
+fcntl.h
+-
+event2/event.h
+-
+assert.h
+-
+unistd.h
+-
+string.h
+-
+stdlib.h
+-
+stdio.h
+-
+errno.h
+-
+

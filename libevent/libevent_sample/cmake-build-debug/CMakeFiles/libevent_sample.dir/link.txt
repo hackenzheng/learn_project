@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/libevent_sample.dir/test.cpp.o CMakeFiles/libevent_sample.dir/server_by_select.c.o CMakeFiles/libevent_sample.dir/client.c.o  -o libevent_sample 

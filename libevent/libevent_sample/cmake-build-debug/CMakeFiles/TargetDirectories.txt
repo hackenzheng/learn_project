@@ -1,0 +1,4 @@
+/home/zhg/CLionProjects/libevent_sample/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/zhg/CLionProjects/libevent_sample/cmake-build-debug/CMakeFiles/libevent_sample.dir
+/home/zhg/CLionProjects/libevent_sample/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/zhg/CLionProjects/libevent_sample/cmake-build-debug/CMakeFiles/server_libevent.dir

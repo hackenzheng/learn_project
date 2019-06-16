@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/zhg/CLionProjects/libevent_sample/test.cpp
+iostream
+-
+cstring
+-
+event.h
+-
+event2/thread.h
+-
+unistd.h
+-
+

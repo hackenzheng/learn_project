@@ -1,0 +1,32 @@
+with index, offset 10000, limit 100 100milion data 
+
+start query test
+{"datestr": "20190410", "age": 96}
+{"datestr": "20191223", "age": 28}
+{"datestr": "20190106", "age": 90}
+{"datestr": "20190623", "age": 61}
+{"datestr": "20190501", "age": 48}
+{"datestr": "20190803", "age": 61}
+{"datestr": "20190811", "age": 42}
+{"datestr": "20190324", "age": 20}
+{"datestr": "20190313", "age": 47}
+{"datestr": "20190301", "age": 79}
+min query latency time is 0.0020203590393066406
+max query latency time is 15.186711549758911
+average query latency time is 1.5241864204406739
+data query elapse is 15.241864204406738
+start query test
+{"age": 95, "datestr": "20190606"}
+{"age": 80, "datestr": "20190620"}
+{"age": 37, "datestr": "20190604"}
+{"age": 78, "datestr": "20190620"}
+{"age": 20, "datestr": "20190629"}
+{"age": 95, "datestr": "20190625"}
+{"age": 32, "datestr": "20190614"}
+{"age": 68, "datestr": "20190605"}
+{"age": 74, "datestr": "20190602"}
+{"age": 80, "datestr": "20190605"}
+min query latency time is 0.009313821792602539
+max query latency time is 28.59288239479065
+average query latency time is 16.613013100624084
+data query elapse is 166.13013100624084

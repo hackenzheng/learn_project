@@ -1,0 +1,53 @@
+start test, time is: %s 1560335042.6573784
+
+with index
+
+average insert speed is 96 item/s
+data insert from 0 to 10000 time elapse is 103.79933834075928
+{"gender": "female", "datestr": "20190626", "age": 32}
+average query latency time is 0.016088128089904785
+data query when num from 0 to 10000 time elapse is 0.16088128089904785
+
+
+average insert speed is 98 item/s
+data insert from 10000 to 100000 time elapse is 912.5703189373016
+{"gender": "female", "datestr": "20190630", "age": 31}
+average query latency time is 0.013680267333984374
+data query when num from 10000 to 100000 time elapse is 0.13680267333984375
+
+
+average insert speed is 97 item/s
+data insert from 100000 to 1000000 time elapse is 9211.920873880386
+{"gender": "male", "datestr": "20190607", "age": 64}
+average query latency time is 0.02370171546936035
+data query when num from 100000 to 1000000 time elapse is 0.23701715469360352
+
+
+average insert speed is 296 item/s
+data insert from 1000000 to 5000000 time elapse is 13512.241714477539
+{"gender": "female", "datestr": "20190609", "age": 6}
+average query latency time is 2.98577766418457
+data query when num from 1000000 to 5000000 time elapse is 29.857776641845703
+
+
+average insert speed is 422 item/s
+data insert from 5000000 to 10000000 time elapse is 11839.13466334343
+{"gender": "female", "datestr": "20190605", "age": 4}
+average query latency time is 30.51394181251526
+data query when num from 5000000 to 10000000 time elapse is 305.1394181251526
+
+
+average insert speed is 389 item/s
+data insert from 10000000 to 20000000 time elapse is 25668.910442590714
+{"gender": "male", "datestr": "20190622", "age": 42}
+average query latency time is 106.04892227649688
+data query when num from 10000000 to 20000000 time elapse is 1060.4892227649689
+
+
+average insert speed is 400 item/s
+data insert from 20000000 to 40000000 time elapse is 49993.25647306442
+{"gender": "male", "datestr": "20190614", "age": 74}
+average query latency time is 18.505378675460815
+data query when num from 20000000 to 40000000 time elapse is 185.05378675460815
+
+

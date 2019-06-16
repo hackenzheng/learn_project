@@ -1,0 +1,18 @@
+start query test
+Database(MongoClient(host=['192.168.11.127:27017'], document_class=dict, tz_aware=False, connect=True), 'ailite')
+MongoClient(host=['192.168.11.127:27017'], document_class=dict, tz_aware=False, connect=True)
+with skip and limit args
+{"age": 71, "datestr": "20190411"}
+{"age": 35, "datestr": "20190723"}
+{"age": 55, "datestr": "20190426"}
+{"age": 82, "datestr": "20190122"}
+{"age": 44, "datestr": "20190618"}
+{"age": 84, "datestr": "20191107"}
+{"age": 46, "datestr": "20191102"}
+{"age": 75, "datestr": "20190613"}
+{"age": 15, "datestr": "20190327"}
+{"age": 1, "datestr": "20190607"}
+min query latency time is 0.0038247108459472656
+max query latency time is 1.4967329502105713
+average query latency time is 0.17267138957977296
+data query elapse is 1.7267138957977295

@@ -1,0 +1,59 @@
+Database(MongoClient(host=['192.168.11.127:27017'], document_class=dict, tz_aware=False, connect=True), 'ailite')
+MongoClient(host=['192.168.11.127:27017'], document_class=dict, tz_aware=False, connect=True)
+start test, time is: %s 1560420818.4995894
+average insert speed is 1594 item/s
+data insert from 0 to 10000 time elapse is 6.272643804550171
+{"age": 63, "datestr": "20190614", "gender": "male"}
+average query latency time is 0.018975186347961425
+data query when num from 0 to 10000 time elapse is 0.18975186347961426
+
+
+average insert speed is 1415 item/s
+data insert from 10000 to 100000 time elapse is 63.581668853759766
+{"age": 33, "datestr": "20190630", "gender": "male"}
+average query latency time is 0.061400437355041505
+data query when num from 10000 to 100000 time elapse is 0.614004373550415
+
+
+average insert speed is 3458 item/s
+data insert from 100000 to 1000000 time elapse is 260.2021293640137
+{"age": 49, "datestr": "20190611", "gender": "female"}
+average query latency time is 0.491329026222229
+data query when num from 100000 to 1000000 time elapse is 4.91329026222229
+
+
+average insert speed is 4298 item/s
+data insert from 1000000 to 5000000 time elapse is 930.5320839881897
+{"age": 39, "datestr": "20190623", "gender": "male"}
+average query latency time is 2.451798844337463
+data query when num from 1000000 to 5000000 time elapse is 24.517988443374634
+
+
+average insert speed is 3053 item/s
+data insert from 5000000 to 10000000 time elapse is 1637.6496636867523
+{"age": 8, "datestr": "20190618", "gender": "female"}
+average query latency time is 5.133792805671692
+data query when num from 5000000 to 10000000 time elapse is 51.33792805671692
+
+
+average insert speed is 7203 item/s
+data insert from 10000000 to 20000000 time elapse is 1388.288821220398
+{"age": 5, "datestr": "20190629", "gender": "male"}
+average query latency time is 14.791895294189453
+data query when num from 10000000 to 20000000 time elapse is 147.91895294189453
+
+
+average insert speed is 9818 item/s
+data insert from 20000000 to 30000000 time elapse is 1018.4653058052063
+{"age": 73, "datestr": "20190623", "gender": "male"}
+average query latency time is 13.797347331047058
+data query when num from 20000000 to 30000000 time elapse is 137.97347331047058
+
+
+average insert speed is 19946 item/s
+data insert from 30000000 to 40000000 time elapse is 501.33585715293884
+{"age": 68, "datestr": "20190603", "gender": "male"}
+average query latency time is 17.525246620178223
+data query when num from 30000000 to 40000000 time elapse is 175.25246620178223
+
+

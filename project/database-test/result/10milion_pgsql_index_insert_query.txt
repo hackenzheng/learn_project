@@ -1,0 +1,81 @@
+average insert speed is 572 item/s
+data insert from 0 to 1000000 time elapse is 1747.8681893348694
+average query latency time is 0.02293257713317871
+data query when num from 0 to 1000000 time elapse is 0.2293257713317871
+
+
+average insert speed is 449 item/s
+data insert from 1000000 to 5000000 time elapse is 8900.586615085602
+average query latency time is 0.4913045406341553
+data query when num from 1000000 to 5000000 time elapse is 4.913045406341553
+
+
+average insert speed is 455 item/s
+data insert from 5000000 to 10000000 time elapse is 10987.01409816742
+average query latency time is 0.9188529253005981
+data query when num from 5000000 to 10000000 time elapse is 9.188529253005981
+
+
+Traceback (most recent call last):
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/engine/base.py", line 1193, in _execute_context
+    context)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/engine/default.py", line 507, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.OperationalError: terminating connection due to administrator command
+SSL connection has been closed unexpectedly
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "main.py", line 86, in <module>
+    time_elapse = insert_test(last_position, current_position)
+  File "main.py", line 41, in insert_test
+    batch_insert(session, DayResult, tmp)
+  File "/home/zhg/project/aios-tp/flbackend/database-test/py_orm_mysql.py", line 140, in batch_insert
+    session.commit()
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/orm/session.py", line 943, in commit
+    self.transaction.commit()
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/orm/session.py", line 467, in commit
+    self._prepare_impl()
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/orm/session.py", line 447, in _prepare_impl
+    self.session.flush()
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/orm/session.py", line 2254, in flush
+    self._flush(objects)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/orm/session.py", line 2380, in _flush
+    transaction.rollback(_capture_exception=True)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/util/langhelpers.py", line 66, in __exit__
+    compat.reraise(exc_type, exc_value, exc_tb)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/util/compat.py", line 187, in reraise
+    raise value
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/orm/session.py", line 2344, in _flush
+    flush_context.execute()
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/orm/unitofwork.py", line 391, in execute
+    rec.execute(self)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/orm/unitofwork.py", line 556, in execute
+    uow
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/orm/persistence.py", line 181, in save_obj
+    mapper, table, insert)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/orm/persistence.py", line 866, in _emit_insert_statements
+    execute(statement, params)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/engine/base.py", line 948, in execute
+    return meth(self, multiparams, params)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/sql/elements.py", line 269, in _execute_on_connection
+    return connection._execute_clauseelement(self, multiparams, params)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/engine/base.py", line 1060, in _execute_clauseelement
+    compiled_sql, distilled_params
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/engine/base.py", line 1200, in _execute_context
+    context)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/engine/base.py", line 1413, in _handle_dbapi_exception
+    exc_info
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/util/compat.py", line 203, in raise_from_cause
+    reraise(type(exception), exception, tb=exc_tb, cause=cause)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/util/compat.py", line 186, in reraise
+    raise value.with_traceback(tb)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/engine/base.py", line 1193, in _execute_context
+    context)
+  File "/home/zhg/project/venv/lib/python3.5/site-packages/sqlalchemy/engine/default.py", line 507, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (psycopg2.OperationalError) terminating connection due to administrator command
+SSL connection has been closed unexpectedly
+ [SQL: 'INSERT INTO day_result_index (datestr, region_id, profile_id, user_capture_days, age, gender, lable, vip) VALUES (%(datestr)s, %(region_id)s, %(profile_id)s, %(user_capture_days)s, %(age)s, %(gender)s, %(lable)s, %(vip)s) RETURNING day_result_index.tid'] [parameters: {'age': 39, 'vip': 0, 'lable': ['food', 'money', 'movie'], 'region_id': 93, 'datestr': '20190610', 'user_capture_days': 46, 'profile_id': UUID('92ee26ff-8bc8-11e9-b3f3-005056bf787f'), 'gender': 'female'}] (Background on this error at: http://sqlalche.me/e/e3q8)

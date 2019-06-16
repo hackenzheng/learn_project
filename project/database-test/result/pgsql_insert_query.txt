@@ -1,0 +1,36 @@
+average insert speed is 176 item/s
+data insert from 0 to 1000000 time elapse is 5659.7633402347565
+average query latency time is 0.11213786602020263
+data query when num from 0 to 1000000 time elapse is 1.1213786602020264
+
+
+average insert speed is 188 item/s
+data insert from 1000000 to 5000000 time elapse is 21201.52380657196
+average query latency time is 0.4297525644302368
+data query when num from 1000000 to 5000000 time elapse is 4.297525644302368
+
+
+average insert speed is 225 item/s
+data insert from 5000000 to 10000000 time elapse is 22205.190297603607
+average query latency time is 0.7457026481628418
+data query when num from 5000000 to 10000000 time elapse is 7.457026481628418
+
+
+average insert speed is 620 item/s
+data insert from 10000000 to 20000000 time elapse is 16109.139882087708
+average query latency time is 1.4681042909622193
+data query when num from 10000000 to 20000000 time elapse is 14.681042909622192
+
+
+average insert speed is 574 item/s
+data insert from 20000000 to 50000000 time elapse is 52254.96453356743
+average query latency time is 3.993354249000549
+data query when num from 20000000 to 50000000 time elapse is 39.93354249000549
+
+
+average insert speed is 646 item/s
+data insert from 50000000 to 100000000 time elapse is 77395.79138755798
+average query latency time is 16.40740191936493
+data query when num from 50000000 to 100000000 time elapse is 164.0740191936493
+
+

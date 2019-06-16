@@ -1,0 +1,16 @@
+start query test
+100milion data item, no index
+{"age": 68, "datestr": "20190426"}
+{"age": 21, "datestr": "20190309"}
+{"age": 1, "datestr": "20190610"}
+{"age": 39, "datestr": "20191218"}
+{"age": 12, "datestr": "20190203"}
+{"age": 78, "datestr": "20190721"}
+{"age": 80, "datestr": "20191105"}
+{"age": 58, "datestr": "20190520"}
+{"age": 92, "datestr": "20190806"}
+{"age": 5, "datestr": "20190610"}
+min query latency time is 5.411780595779419
+max query latency time is 7.191447734832764
+average query latency time is 5.950601029396057
+data query elapse is 59.50601029396057

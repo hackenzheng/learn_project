@@ -1,0 +1,50 @@
+start test, time is: %s 1560334968.5234857
+average insert speed is 93 item/s
+data insert from 0 to 10000 time elapse is 106.63040089607239
+{"age": 82, "gender": "male", "datestr": "20190608"}
+average query latency time is 0.017981815338134765
+data query when num from 0 to 10000 time elapse is 0.17981815338134766
+
+
+average insert speed is 92 item/s
+data insert from 10000 to 100000 time elapse is 976.0953676700592
+{"age": 79, "gender": "female", "datestr": "20190626"}
+average query latency time is 0.01850893497467041
+data query when num from 10000 to 100000 time elapse is 0.1850893497467041
+
+
+average insert speed is 94 item/s
+data insert from 100000 to 1000000 time elapse is 9555.45487499237
+{"age": 9, "gender": "male", "datestr": "20190621"}
+average query latency time is 0.031021952629089355
+data query when num from 100000 to 1000000 time elapse is 0.31021952629089355
+
+
+average insert speed is 209 item/s
+data insert from 1000000 to 5000000 time elapse is 19097.245667696
+{"age": 89, "gender": "female", "datestr": "20190619"}
+average query latency time is 1.4687773704528808
+data query when num from 1000000 to 5000000 time elapse is 14.687773704528809
+
+
+average insert speed is 194 item/s
+data insert from 5000000 to 10000000 time elapse is 25769.19702744484
+{"age": 80, "gender": "male", "datestr": "20190624"}
+average query latency time is 14.232399845123291
+data query when num from 5000000 to 10000000 time elapse is 142.3239984512329
+
+
+average insert speed is 192 item/s
+data insert from 10000000 to 20000000 time elapse is 51921.76674127579
+{"age": 68, "gender": "male", "datestr": "20190614"}
+average query latency time is 3.5306110620498656
+data query when num from 10000000 to 20000000 time elapse is 35.30611062049866
+
+
+average insert speed is 217 item/s
+data insert from 20000000 to 30000000 time elapse is 46006.0660610199
+{"age": 8, "gender": "male", "datestr": "20190601"}
+average query latency time is 21.453676867485047
+data query when num from 20000000 to 30000000 time elapse is 214.53676867485046
+
+

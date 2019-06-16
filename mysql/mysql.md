@@ -429,22 +429,8 @@ UTC时间是世界协调时间（又称世界标准时间），在一般精度�
 <Linux操作系统时间与BIOS硬件时间>  https://www.cnblogs.com/ajianbeyourself/p/4189520.html
 
 
-## pgsql中文存储
-在postgresql中，中文是以中文编码的方式存储在服务端，比如'中文'两个字实际存储为utf-8为'\u4e2d\u6587'。
-pgsql支持简体中文有四种编码：EUC_CN（Extended UNIX Code-CN）、GB18030、GBK和UTF-8。但GB18030和GBK只能作为客户端编码，不能设置为服务端编码,服务端一般都用utf-8.
+## join优化
+多个表连接查询，最进程的方式是嵌套join(nested loop join),分为内外表，每扫描外表的一行数据都要在内表中查找与之匹配的行，没有索引的 复杂度是
+O(n*m). 在此基础上进行优化出现了merge join和hash join.
 
-查看pg客户端字符编码: show client_encoding；
-查看pg服务端字符编码: show server_encoding。
-
-python中对utf-8的处理
-
-    1 >>> s = u'\u4e2d\u6587'
-    2 >>> print s
-    3 中文
-    1 >>> s = '\u4e2d\u6587'    
-    2 >>> print s
-    3 中文
-    
-    Python3中默认就是utf-8编码，是否前缀u''不影响
-    
-<PostgreSQL 字符集问题> https://www.douban.com/note/331854618/
+hash join将小表作为hash表放在内存中，加快查询速度。不过hash join只适用于等值连接。

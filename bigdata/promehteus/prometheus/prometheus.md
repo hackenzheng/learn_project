@@ -120,7 +120,9 @@ Prometheus Web界面自带的图表是非常基础的，比较适合用来做测
 <监控redis> https://yq.aliyun.com/articles/251478
 
 监控自己开发的应用服务，首先需要服务提供api通metric查询或者直接将metric推到push-gateway. 在cloud-ai项目中，
-是在monitoring namespace中创建一个cloud-push-gateway,配置prometheus从这里拉取数据
+是在monitoring namespace中创建一个cloud-push-gateway,grpc-server在接收到图片请求时，一是放到kafaka队列中，二是
+将数据推送到官方的prometheus-push-gateway。另外又部署了cloud-pushgateway-deployment提供metric api供prometheus主动拉取。
+客流统计走的是push gateway, versionbook走的是通过aiohttp提供metrics api。
 
 prometheus也可以监控到进程级别，需要安装process-exporter, 这样在做压力测试的时候只要管应用层，服务进程性能指标监控只要做简单配置。
 

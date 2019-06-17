@@ -52,18 +52,13 @@ rancher能够部署prometheus和grafana,每个只起了一个pod,但每个pod里
     
 部署prometheus组件：
 
-    kubectl create -f  k8s-prometheus-grafana/prometheus/rbac-setup.yaml
-    kubectl create -f  k8s-prometheus-grafana/prometheus/configmap.yaml 
-    kubectl create -f  k8s-prometheus-grafana/prometheus/prometheus.deploy.yml
-    kubectl create -f  k8s-prometheus-grafana/prometheus/prometheus.svc.yml
+    kubectl create -f  k8s-prometheus-grafana/prometheus
     
     界面访问 http://localhost:30003/target 
     
 部署grafana组件:
 
-     kubectl create -f   k8s-prometheus-grafana/grafana/grafana-deploy.yaml
-     kubectl create -f   k8s-prometheus-grafana/grafana/grafana-svc.yaml
-     kubectl create -f   k8s-prometheus-grafana/grafana/grafana-ing.yaml
+     kubectl create -f   k8s-prometheus-grafana/grafana/
      
      界面访问 http://localhost:3000   admin/admin
      由于官方grafana镜像支持的数据源或者展示面板不够丰富,根据需要重新封装镜像

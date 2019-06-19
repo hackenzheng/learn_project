@@ -194,9 +194,11 @@ NULL代表没有值，意味着你并不知道该列应该填入什么数据，�
        apt-get install libaio1 安装动态库
        bin/mysqld --initialize --user=mysql  初始化data目录
        bin/mysqld_safe --user=mysql &或bin/mysqld 启动，会给root用户初始化一个随机密码
-       mysql -u root -p  连接数据库
+       mysqld --datadir=/home/zhg/bin/mysql/data2   密码123456　本机环境启动
+       mysql -u root -p  连接数据库，　　
        alter user 'root'@'localhost' identified by 'youpassword';  修改密码
        flush privileges;    刷新权限
+       
        
        create database T2;
        use T2;

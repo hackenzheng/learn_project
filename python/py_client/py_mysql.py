@@ -9,7 +9,7 @@ class PyMysql:
     def __init__(self):
         self.conn = None
         self.cursor = None
-    # 链接mysql数据库
+
     def connect(self, host, user, passwd, db, port=3306, charset="utf8"):
         try:
             self.conn = pymysql.connect(host=host, user=user, passwd=passwd, db=db, port=port, charset=charset,
@@ -20,7 +20,7 @@ class PyMysql:
             logging.error('connect mysql database %s error! %s' % (db, e))
             return False
         return True
-    # 切换游标
+
     def switch_cursor(self, curclass):
         if not isinstance(curclass, (pymysql.cursors.Cursor, pymysql.cursors.DictCursor,
                                      pymysql.cursors.SSCursor, pymysql.cursors.SSDictCursor)):
@@ -29,7 +29,6 @@ class PyMysql:
         self.cursor = self.conn.cursor(cursorclass=curclass)
         return True
 
-    # 指定sql命令查询
     def query(self, sqlcommand, args=None):
         try:
             self.cursor = self.conn.cursor()
@@ -40,7 +39,6 @@ class PyMysql:
             return False
         return result
 
-    # 指定sql命令执行
     def execute(self, sqlcommand, args=None):
         try:
             self.cursor = self.conn.cursor()
@@ -55,15 +53,12 @@ class PyMysql:
             return False
         return line, self.cursor
 
-    # 提交
     def commit(self):
         self.conn.commit()
 
-    # 回滚
     def rollback(self):
         self.conn.rollback()
 
-    # 关闭链接
     def close(self):
         if self.cursor:
             self.cursor.close()
@@ -71,7 +66,6 @@ class PyMysql:
             self.conn.close()
         logging.info('close mysql success')
 
-    # 插入数据
     def insert_data(self, table_name, data_dict):
         data_values = "(" + "%s," * (len(data_dict)) + ")"
         data_values = data_values.replace(',)', ')')
@@ -84,12 +78,6 @@ class PyMysql:
         self.execute(sql, params)
         self.commit()
         #self.close()
-
-
-# docker run -p 3306:3306 --name mysql_docker -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.6   运行
-#
-# mysql -u root -p
-# CREATE DATABASE IF NOT EXISTS $PROJECT default charset utf8 COLLATE utf8_general_ci;
 
 def test():
     py_sql = PyMysql()
@@ -127,26 +115,6 @@ if __name__ == "__main__":
     # py_sql.execute(sql)
     # py_sql.conn.commit()
     # print('delete t_face_1')
-    # sql = 'truncate table t_face_2'  # 清空数据表
-    # py_sql.execute(sql)
-    # py_sql.conn.commit()
-    # print('delete t_face_2')
-    # sql = 'truncate table t_face_3'  # 清空数据表
-    # py_sql.execute(sql)
-    # py_sql.conn.commit()
-    # print('delete t_face_3')
-    # sql = 'truncate table t_image_1'  # 清空数据表
-    # py_sql.execute(sql)
-    # py_sql.conn.commit()
-    # print('delete t_image_1')
-    # sql = 'truncate table t_image_2'  # 清空数据表
-    # py_sql.execute(sql)
-    # py_sql.conn.commit()
-    # print('delete t_image_2')
-    # sql = 'truncate table t_image_3'  # 清空数据表
-    # py_sql.execute(sql)
-    # py_sql.conn.commit()
-    # print('delete t_image_3')
     # py_sql.close()
 
 

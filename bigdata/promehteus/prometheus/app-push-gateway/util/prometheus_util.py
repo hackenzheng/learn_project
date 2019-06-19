@@ -109,11 +109,9 @@ class Promethus():
         return False
 
 
-    # 删除matric
     async def delete(self,metric_name):
         del self.all_metric[metric_name]
 
-    # 读取metric的数据
     async def get_metric_prometheus(self,metric_name):
         if metric_name in self.all_metric[metric_name]:
             # 根据data生成prometheus格式数据,

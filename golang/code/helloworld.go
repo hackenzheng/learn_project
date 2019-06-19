@@ -12,6 +12,6 @@ package main
 import "fmt"
 
 func main() {
-    //  Go使用UTF-8字符串和标识符(因为UTF-8的发明者也就是Go的发明者之一)，所以它天生支持多语言。
-    fmt.Printf(Hello, world or 你好，世界 or καλημ ́ρα κóσμ or こんにちはせかい\n")
+    //  Go使用UTF-8字符串和标识符(因为UTF-8的发明者也就是Go的发明者之一)，所以天生支持多语言。
+    fmt.Printf("Hello, world or 你好，世界 or καλημ ́ρα κóσμ or こんにちはせかい\n")
 }

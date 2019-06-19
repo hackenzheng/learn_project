@@ -25,4 +25,14 @@ apt安装， 在线安装的方式，能够自动解决软件依赖关系，安�
 在用docker发布时如果有通过此方式安装最好清理一下。 另外apt安装时还会在/var/lib/apt/lists存储软件包列表信息，可以手动清理
 
 
+## ubuntu可视化
+ssh到Ubuntu服务器能够显示图片等使用ssh -X模式
+
+vnc第一次连接灰屏的解决方法，修改xstartup配置，https://bbs.csdn.net/topics/392040167
+对16.04的系统，帖子安装的软件不全，而且要对xstartup文件添加可执行权限
+上运行xhost + 表示任意ip都能连上xserver gnome-panel
+
+vnc启动： vncserver -name zhg -geometry 1920x1080 -pixelformat RGB888 -depth 24
+
+
 

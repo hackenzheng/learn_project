@@ -45,6 +45,10 @@ top:
     P – 以 CPU 占用率大小的顺序排列进程列表
     M – 以内存占用率大小的顺序排列进程列表
     
+set:
+    
+    设置环境变量用, 符号"+"和"-"的作用分别是打开和关闭指定的模式, 常用于执行脚本前的环境配置
+    set -e; -e：若指令传回值不等于0，则立即退出shell。
 
 挂载磁盘 
 
@@ -134,11 +138,4 @@ ssh认证方式有密码和秘钥两种方式， 将本机公钥放到对端，s
 
 ssh -o ServerAliveInterval=30 z177  定时连接，避免服务中断
 
-## ubuntu可视化
-ssh到Ubuntu服务器能够显示图片等使用ssh -X模式
 
-vnc第一次连接灰屏的解决方法，修改xstartup配置，https://bbs.csdn.net/topics/392040167
-对16.04的系统，帖子安装的软件不全，而且要对xstartup文件添加可执行权限
-上运行xhost + 表示任意ip都能连上xserver gnome-panel
-
-vnc启动： vncserver -name zhg -geometry 1920x1080 -pixelformat RGB888 -depth 24

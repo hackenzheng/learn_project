@@ -125,7 +125,7 @@ Fprintf 将参数列表 a 填写到格式字符串format的占位符中并将填
     当匿名字段是一个struct的时候，那么这个struct所拥有的全部字段都被隐式地引入了当前定义的这个struct，访问的时候就跟访问自己字段一样。
     如果匿名struct中的字段和自身的字段重名了，最外层的优先访问，要访问匿名字段就要加上匿名struct名。
     
-<struct内不能的反引号> https://blog.csdn.net/jason_cuijiahui/article/details/82987091
+<struct内部用的反引号> https://blog.csdn.net/jason_cuijiahui/article/details/82987091
     
 ### 面向对象编程
 数据绑定方法即对象，在go里面method是函数的另外一种形态，是单独定义，不是在struct里面定义，与定义func类似，只是加了一个receiver。

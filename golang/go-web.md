@@ -58,6 +58,11 @@ make和new都是(堆)内存的分配：new用于各种类型的内存分配，�
 
 零值并非是空值，而是一种“变量未填充前”的默认值，int类型的零值是0,string类型的零值是""，引用类型的零值是nil
 
+单引号双引号和反引号：双引号和反引号都可用于表示一个常量字符串，双引号用来创建可解析的字符串(支持转义，但不能用来引用多行)。
+反引号用来创建原生的字符串，可以由多行组成(不支持任何转义序列)，原生的字符串多用于书写多行消息、HTML以及正则表达式。
+
+
+
 ### 函数
 应用包中大写开头的函数和变量是公有的，小写开头的是私有的。如果你的函数是导出的(首字母大写)，官方建议：最好命名返回值，因为不命名返回值，
 虽然使得代码更加简洁了，但是会造成生成的文档可读性差。
@@ -120,6 +125,7 @@ Fprintf 将参数列表 a 填写到格式字符串format的占位符中并将填
     当匿名字段是一个struct的时候，那么这个struct所拥有的全部字段都被隐式地引入了当前定义的这个struct，访问的时候就跟访问自己字段一样。
     如果匿名struct中的字段和自身的字段重名了，最外层的优先访问，要访问匿名字段就要加上匿名struct名。
     
+<struct内不能的反引号> https://blog.csdn.net/jason_cuijiahui/article/details/82987091
     
 ### 面向对象编程
 数据绑定方法即对象，在go里面method是函数的另外一种形态，是单独定义，不是在struct里面定义，与定义func类似，只是加了一个receiver。
@@ -358,6 +364,6 @@ Go语言中自带有一个轻量级的测试框架testing和自带的go test命�
 
 参考：
 
-<build-web-application-with-golang> https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md
+< build-web-application-with-golang > https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md
 
 <go语言圣经> https://docs.hacknode.org/gopl-zh/index.html

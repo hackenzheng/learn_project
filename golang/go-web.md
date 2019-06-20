@@ -49,9 +49,10 @@ make和new都是(堆)内存的分配：new用于各种类型的内存分配，�
 应用包中大写开头的函数和变量是公有的，小写开头的是私有的。如果你的函数是导出的(首字母大写)，官方建议：最好命名返回值，因为不命名返回值，
 虽然使得代码更加简洁了，但是会造成生成的文档可读性差。
 
-由于 Go 支持 “多值返回”, 而对于“声明而未被调用”的变量, 编译器会报错, 在这种情况下, 可以使用_来丢弃不需要的返回值 例
+函数被看作第一类值：函数像其他值一样，拥有类型，可以被赋值给其他变量，传递给函数，从函数返回，对函数值的调用类似函数调用。
+在函数内部可以定义匿名函数，func关键字后面没有函数名。
 
-Go没有像Java那样的异常机制，它不能抛出异常，而是使用了panic和recover机制。一定要记住，你应当把它作为最后的手段来使用，也就是说，你的代码中应当没有，或者很少有panic的东西。
+由于 Go 支持 “多值返回”, 而对于“声明而未被调用”的变量, 编译器会报错, 在这种情况下, 可以使用_来丢弃不需要的返回值
 
 Go里面有两个保留的函数：init函数（能够应用于所有的package）和main函数（只能应用于package main）。这两个函数在定义时不能有任何的参数和返回值。
 考虑到可读性和可维护性，强烈建议用户在一个package中每个文件最多写一个init函数，Go程序会自动调用init()和main()。init()可以用于比如数据库连接建立，连接池建立等。
@@ -70,6 +71,8 @@ import导包
     
 defer,延迟的意思，在普通语句前加defer关键字，表示不会立即执行，当函数执行到最后时，这些defer语句会按照逆序执行，最后该函数返回。
 特别是在进行一些打开资源的操作时，遇到错误需要提前返回，在返回前需要关闭相应的资源，不然很容易造成资源泄露等问题，使用defer可减少重复代码，显得更优雅。
+defer语句经常被用于处理成对的操作，如打开、关闭、连接、断开连接、加锁、释放锁。通过defer机制，不论函数逻辑多复杂，都能保证在任何执行路径下，资源被释放。
+释放资源的defer应该直接跟在请求资源的语句后。
 
 函数要作为变量传递给另外一个函数，需要先申明好函数类型 type testfunc func(int, int) bool
 
@@ -108,6 +111,9 @@ Fprintf 将参数列表 a 填写到格式字符串format的占位符中并将填
 ### 面向对象编程
 数据绑定方法即对象，在go里面method是函数的另外一种形态，是单独定义，不是在struct里面定义，与定义func类似，只是加了一个receiver。
 
+在Go语言中，不会像其它语言那样用this或者self作为接收器；可以任意的选择接收器的名字。由于接收器的名字经常会被使用到，
+所以保持其在方法间传递时的一致性和简短性是不错的主意。建议是可以使用其类型的第一个字母，比如使用了Point的首字母p。
+
 method可以定义在任何自定义类型、内置类型、struct上面。自定义类型除了struct还有type typeName typeLiteral形式。
 类似于C语言的typedef。 当method需要修改对象的数据时，receiver应该指定为指针类型
     
@@ -136,6 +142,9 @@ method继承与重写，跟匿名字段的处理方式一样。
 
 
 ### interface
+接口类型是一种抽象的类型。它不会暴露出它所代表的对象的内部值的结构和这个对象支持的基础操作的集合；它们只会表现出它们自己的方法。
+也就是说当你有看到一个接口类型的值时，你不知道它是什么，唯一知道的就是可以通过它的方法来做什么。
+
 interface类型定义了一组方method，如果某个对象实现了某个接口的所有方法，则此对象就实现了此接口。每个对象定义了多个method，不同对象之间有相同的method的，也有不同的method，
 比如Student实现了SayHi、Sing、BorrowMoney；而Employee实现了SayHi、Sing、SpendSalary，都实现了SayHi、Sing，这样就把SayHi、Sing组成一组作为interface。
 interface可以被任意的对象实现，同理一个对象可以实现任意多个interface。
@@ -166,12 +175,53 @@ interface可以被任意的对象实现，同理一个对象可以实现任意�
     Men是interface类型，需要使用该类型去定义变量再使用 
 
 interface的变量可以持有任意实现该interface类型的对象,interface的变量可以持有任意实现该interface类型的对象,类似多态。
-得到一个interface的变量，可以通过value, ok = element.(T)判断变量具体的对象类型。
+空接口定义type Expr interface{}， 一个interface{}类型的参数可以接收任何值。
+
+interfac本质一个结构体，记录了2个指针，初始化两个指针都指向空，使用过程中能够动态赋值。
+
+    指针1，指向该变量的类型
+    指针2，指向该变量的value
+
+<interface讲解> https://docs.hacknode.org/gopl-zh/ch7/ch7-05.html
 
 ### 反射
-反射是指一类应用，它们能够自描述和自控制。Golang语言实现了反射，反射机制就是在运行时动态的调用对象的方法和属性，官方自带的reflect包就是反射相关的，
-只要包含这个包就可以使用。
+Go语音提供了一种机制在运行时更新变量和检查它们的值、调用它们的方法和它们支持的内在操作，但是在编译时并不知道这些变量的具体类型，这种机制被称为反射(import reflect)。
    
+应用到反射的api：获取变量类型(reflect.Typeof), ftm.Fprintf(),encoding/json和encoding/xml序列化功能。   
+
+获取变量的类型，尤其当变量类型是interface时，Python里面是type(),go里面是reflect
+
+    package main
+    
+    import (
+        "fmt"
+        "reflect"
+    )
+    
+    func main() {
+        b := true
+        s := ""
+        n := 1
+        f := 1.0
+        a := []string{"foo", "bar", "baz"}
+    
+        fmt.Println(reflect.TypeOf(b), reflect.ValueOf(b).Kind())
+        fmt.Println(reflect.TypeOf(s), reflect.ValueOf(s).Kind())
+        fmt.Println(reflect.TypeOf(n), reflect.ValueOf(n).Kind())
+        fmt.Println(reflect.TypeOf(f), reflect.ValueOf(f).Kind())
+        fmt.Println(reflect.TypeOf(a), reflect.ValueOf(a).Kind(), reflect.ValueOf(a).Index(0).Kind())
+    }
+    
+    输出
+    bool bool
+    string string
+    int int
+    float64 float64
+    []string slice string
+       
+数据类型判断：1、类型断言i.(type) 只能在switch，if中使用，函数没有返回值； 2使用反射； 3fmt.Sprintf("%T", v)，本质也是用到反射.
+第一种方法需要先知道有几种类型，第二种可以对任意对象使用。
+  
 Go是静态类型语言。每个变量都有且只有一个静态类型，在编译时就已经确定。比如 int、float32、*MyType、[]byte。 如果我们做出如下声明：
 
     type MyInt int
@@ -181,6 +231,7 @@ Go是静态类型语言。每个变量都有且只有一个静态类型，在编
     
 上面的代码中，变量 i 的类型是 int，j 的类型是 MyInt。尽管变量 i 和 j 具有共同的底层类型 int，但它们的静态类型并不一样。不经过类型转换直接相互赋值时，编译器会报错。
    
+
 <Go 语言反射三定律> https://segmentfault.com/a/1190000006190038 是官方文档的翻译 https://blog.golang.org/laws-of-reflection
 
 <Golang的反射reflect深入理解和示例> https://juejin.im/post/5a75a4fb5188257a82110544
@@ -205,6 +256,8 @@ go关键词就是创建并开始执行goroutine，用法如下：
     golang的goroutine默认情况下使用单核运行，开启多核运行的方法是使用runtime包中的GOMAXPROCS函数设置核心数.
     runtime.GOMAXPROCS(runtime.NumCPU())
 
+main函数默认是主goroutine,主函数返回时，所有的goroutine都会被直接打断，程序退出。除了从主函数退出或者直接终止程序之外，没有其它的编程方法能够让一个goroutine来打断另一个的执行
+
 channel类似于双向管道,可以通过它发送或者接收值.定义一个channel时，也需要定义发送到channel的值的类型,必须使用make 创建channel.
 默认情况下，channel接收和发送数据都是阻塞的即无缓冲，除非另一端已经准备好。无缓冲channel是在多个goroutine之间同步很棒的工具
 
@@ -218,12 +271,19 @@ channel操作：
     v := <-ch  // 从ch中接收数据，并赋值给v
     
     close(ci)  //需要显式关闭，避免内存泄露
+
+基于无缓存Channels的发送和接收操作将导致两个goroutine做一次同步操作。因为这个原因，无缓存Channels有时候也被称为同步Channels。
+当通过一个无缓存Channels发送数据时，接收者收到数据发生在唤醒发送者goroutine之前.
+
 缓冲channel即创建的时候指定缓冲大小，ch:= make(chan bool, 4)，创建了可以存储4个元素的bool 型channel。在这个channel 中，
 前4个元素可以无阻塞的写入。当写入第5个元素时，代码将会阻塞，直到其他goroutine从channel 中读取一些元素，腾出空间。
 
 select:有多个channel时，通过select可以监听channel上的数据流动。select默认是阻塞的，只有当监听的channel中有发送或接收可以进行时才会运行，
-当多个channel都准备好的时候，select是随机的选择一个执行的。 select功能类似io复用的select，用法类似switch语句。
-
+当多个channel都准备好的时候，select是随机的选择一个执行的。 select功能类似io复用的select，用法类似switch语句,也会有几个case和最后的default选择分支。
+每一个case代表一个通信操作（在某个channel上进行发送或者接收），并且会包含一些语句组成的一个语句块。一个接收表达式可能只包含接收表达式自身
+   
+其他同步工具； sync.Mutex, sync.RWMutex,
+   
    
 ## go语言web编程
 开发web服务器可以使用标准库net/http
@@ -243,7 +303,17 @@ go提供了rpc标准库，分为tcp,http,json三个层次
    
    
 ## 调试与error处理
-Go定义了一个叫做error的类型，来显式表达错误。在使用时，通过把返回的error变量与nil的比较，来判定操作是否成功。
+go语言支持异常，但不支持传统的 try…catch…finally这种异常，因为Go语言的设计者们认为，将异常与控制结构混在一起会很容易使得代码变得混乱。因为开发者很容易
+滥用异常，将原本应该返回错误的也作为异常处理。在Go语言中，使用多值返回来返回错误。不要用异常代替错误，更不要用来控制流程。在极个别的情况下，也就是说，
+遇到真正的异常的情况下（比如除数为0了），才使用Go中引入的Exception处理：defer, panic, recover。
+
+使用panic抛出异常，然后在defer中通过recover捕获这个异常，然后正常处理。当panic异常发生时，程序会中断运行，并立即执行在该goroutine中被延迟的函数（defer 机制）。
+随后，程序崩溃并输出日志信息。日志信息包括panic value和函数调用的堆栈跟踪信息。panic value通常是某种错误信息。对于每个goroutine，
+日志信息中都会有与之相对的，发生panic时的函数调用堆栈跟踪信息函数执行的时候panic了，等defer的东西都跑完了，panic再向上传递。所以这时候 defer 
+有点类似 try-catch-finally 中的 finally。recover之后，逻辑并不会恢复到panic那个点去，函数还是会在defer之后返回。异常来源：运行时或直接调用内置的panic函数
+
+Go定义了一个叫做error的接口类型，来显式表达错误。在使用时，通过把返回的error变量与nil的比较，来判定操作是否成功。
+对于non-nil的error值,可以通过调用error的Error函数或者fmt.Printf()等输出函数获得字符串类型的错误信息。
 
 error类型是一个接口类型
 
@@ -252,7 +322,7 @@ error类型是一个接口类型
     }
 
 Go在错误处理上采用了与C类似的检查返回值的方式，而不是其他多数主流语言采用的异常方式，这造成了代码编写上的一个很大的缺点:错误处理代码的冗余，
-对于这种情况是我们通过复用检测函数来减少类似的代码。
+对于这种情况是可以通过定义一个检测函数然后复用检测函数来减少类似的代码。
 
 go代码调试可以直接用gdb工具，与调试c代码是一样的。
 
@@ -265,4 +335,8 @@ Go语言中自带有一个轻量级的测试框架testing和自带的go test命�
 <go的测试> https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/11.3.md
 
 
+参考：
+
 <build-web-application-with-golang> https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md
+
+<go语言圣经> https://docs.hacknode.org/gopl-zh/index.html

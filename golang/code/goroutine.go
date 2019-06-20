@@ -15,7 +15,7 @@ func say(s string) {
 }
 
 func main() {
-    go say("world") //开一个新的Goroutines执行， 如果这行放在下面，只会输出hello
-    say("hello") //当前Goroutines执行，如果这里也有go关键词，将不会有任何输出
+    go say("world") //开一个新的Goroutines执行， 如果这行放在下面，只会输出hello，也是因为主goroutine直接退出了
+    say("hello") //当前Goroutines执行，如果这里也有go关键词，将不会有任何输出，因为主goroutine是空的，直接退出
 
 }

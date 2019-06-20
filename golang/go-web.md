@@ -1,8 +1,8 @@
 ## go语言基础
 
 ### 包的编译与调用
-GOPATH环境变量用于设置本地源码和包路径路径,从go1.8之后不用必须设置,默认是$HOME/go。 GOPATH下分src,pkg,bin三个子目录。
-若项目依赖其他package应放在src目录下，若只是单个文件测试任意路径都可以。一般的做法就是一个目录一个项目，
+GOPATH环境变量用于设置本地源码和包路径路径,从go1.8之后不用必须设置,默认是$HOME/go。 设置方式export GOPATH=/home/apple/mygo。
+GOPATH下分src,pkg,bin三个子目录。若项目依赖其他package应放在src目录下，若只是单个文件测试任意路径都可以。一般的做法就是一个目录一个项目，
 例如: $GOPATH/src/mymath 表示mymath这个应用包或者可执行应用，这个根据package是main还是其他来决定，main的话就是可执行应用，其他的话就是应用包。
 
 当新建应用或者一个代码包时都是在src目录下新建一个文件夹，文件夹名称一般是代码包名称，当然也允许多级目录，例如在src下面新建了
@@ -12,6 +12,17 @@ GOPATH环境变量用于设置本地源码和包路径路径,从go1.8之后不�
 安装完之后可以在pkg/linux_amd64对应的目录下看到mymath.a文件。这个mymath.a文件就是应用包，在其他项目的源码中使用 import "mymath"即可调用。
 如果mypath.a是子目录下的应用，import时也需要加上路径。
 
+go 里面一个目录为一个package, 一个package级别的func, type, 变量, 常量, 这个package下的所有文件里的代码都可以随意访问, 也不需要首字母大写。
+组成包的多个文件中不能有相同的全局变量和函数（init函数例外）。每个子目录中只能存在一个package，否则编译时会报错。
+组成一个package的多个文件，编译后实际上和一个文件类似。一个包可以对应多个*.go源文件，标记它们属于同一包的唯一依据就是这个package声明，
+也就是说：无论多少个源文件，只要它们开头的package包相同，那么它们就属于同一个包，在编译后就只会生成一个.a文件，并且存放在$GOPATH/pkg文件夹下。
+
+main包所在的文件不一定要有main函数
+
+<包的命名规范> https://blog.golang.org/package-names
+
+<Golang import 包问题相关详解> https://blog.csdn.net/CMbug/article/details/49339341
+
 ### 获取远程包
 对于托管在开源社区如github、googlecode的应用包，go提供了go get工具，比如go get github.com/astaxie/beedb，
 go get本质上可以理解为首先第一步是通过源码工具clone代码到src下面，然后执行go install。
@@ -20,7 +31,7 @@ go get本质上可以理解为首先第一步是通过源码工具clone代码到
 ### go命令
 go install是安装，如果是xx.go源码里面不是package main，就作为应用包处理，install之后会在pkg目录生成xx.a文件。如果有package main，
 则作为应用处理，install之后会在bin目录下生成xx.bin文件，同时也会在当前目录生成bin文件。go install只会到GOPATH/src目录下去找,
-不在这个目录的不能被install，只能build生成临时的。
+不在这个目录的不能被install，只能build生成临时的。对同一个package中不同文件是按文件名字符串比较“从小到大”顺序调用各文件中的init()函数.
 
 go build 默认会编译目录下所有的go文件，可以指定只编译一个文件。若是普通包，go build不会产生任何文件。如果是main包，会生成一个可执行文件。
 
@@ -28,6 +39,8 @@ go fmt, go强制了代码格式，不按照此格式的代码将不能编译通�
 开发工具里面一般都带了保存时候自动格式化功能，这个功能其实在底层就是调用了go fmt。
 
 go env查看go设置的环境变量，其中GOROOT是golang 的安装路径，GOPATH可以理解为工作目录
+
+go run test.go 直接运行go文件，不会保留编译过程中的可执行文件
 
 ### 变量定义及初始化
 var variableName type 最基本的定义形式
@@ -186,6 +199,7 @@ interfac本质一个结构体，记录了2个指针，初始化两个指针都�
 
 ### 反射
 Go语音提供了一种机制在运行时更新变量和检查它们的值、调用它们的方法和它们支持的内在操作，但是在编译时并不知道这些变量的具体类型，这种机制被称为反射(import reflect)。
+反射会增加代码的复杂性，降低执行速度，在自己的代码中可以用已有的用到反射包，但尽量不要自行实现反射机制。
    
 应用到反射的api：获取变量类型(reflect.Typeof), ftm.Fprintf(),encoding/json和encoding/xml序列化功能。   
 
@@ -283,8 +297,15 @@ select:有多个channel时，通过select可以监听channel上的数据流动�
 每一个case代表一个通信操作（在某个channel上进行发送或者接收），并且会包含一些语句组成的一个语句块。一个接收表达式可能只包含接收表达式自身
    
 其他同步工具； sync.Mutex, sync.RWMutex,
-   
-   
+
+### go创建进程
+go封装了与进程相关的接口，在os/exec这个package中。 
+创建并启动新进程执行外部shell命令，exec.Command(),即spawn,shell执行完之后继续执行本程序. 
+只执行外部shell命令，调用syscall.Exec,其后面的代码就不会再执行了，拿不到执行结果即外部程序完全取代本进程。
+go没有提供fork调用，因为使用Spawn,Exec和Goroutines已经能覆盖大部分的使用场景，Spawn和Exec本质是通过fork系统调用实现的。
+
+pid文件1是记录进程信息，二是作为文件锁， 在进程间进行同步
+
 ## go语言web编程
 开发web服务器可以使用标准库net/http
 
